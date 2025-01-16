@@ -42,7 +42,7 @@
 				"editor.formatOnSave": true //,
 			},
 			// Add the IDs of extensions you want installed when the container is created.
-			"extensions": {{ devcontainer.vscode.extensions }}
+			"extensions": {{ devcontainer.vscode.extensions | tojson }}
 		}
 	},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
