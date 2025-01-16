@@ -18,13 +18,13 @@
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "{{ devcontainer.packages }}" //,
-		},
-		//	"desktop-lite": {
-		//		"password": "vscode",
-		//		"webPort": "6080",
-		//		"vncPort": "5901"
-		//	}
+			"packages": "{{ devcontainer.feature.packages }}" //,
+		},{%- if devcontainer.feature.desktop_lite %}
+		"desktop-lite": {
+			"password": "vscode",
+			"webPort": "6080",
+			"vncPort": "5901"
+		}{%- endif %}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [
