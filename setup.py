@@ -51,22 +51,27 @@ def get_package_name(package_xml_path: Path):
     
 
 def main():
+    default_package_name = "my_package"
+    variables = {}
+    
+        
+    if not variables_file.exists():
+        if package_file.exists():
+            package_name = get_package_name(package_file)
+            variables["package_name"] = package_name
+        else:
+            variables["package_name"] = "my_package"
+            print("No package.xml file found. Using 'my_package' as the package name.")
+        render_template(template_dir / ".dev-setup.yml.j2", variables, variables_file)
+
     # Load the variables file
     with open(variables_file) as f:
         variables = yaml.safe_load(f)
-        
-    if package_file.exists():
-        package_name = get_package_name(package_file)
-        variables["package_name"] = package_name
-    else:
-        variables["package_name"] = "my_package"
+        if variables['package_name'] == default_package_name:
+            print("Update the package name in .dev-setup.yml and run this script again.")
     
     render_template_folder(templete_docker_dir, variables, target_dir / "docker")
     render_template(template_dir / "devcontainer.json.j2", variables, Path(".devcontainer/devcontainer.json"))
-    
-    dev_setup_config_file = Path(".dev-setup.yml")
-    if not dev_setup_config_file.exists():
-        render_template(template_dir / ".dev-setup.yml.j2", variables, dev_setup_config_file)
 
 if __name__ == "__main__":
     main()
