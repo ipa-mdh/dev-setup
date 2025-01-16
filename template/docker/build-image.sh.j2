@@ -1,0 +1,12 @@
+#!/bin/bash
+
+{% for key, cfg in dockerfile.items() %}
+    {%- if cfg.build %}
+docker build --file .dev-setup/docker/Dockerfile.{{ key }} \
+    {%- if cfg.build_arguments is defined %}
+    {%- for arg_key, arg_value in cfg.build_arguments.items() %}
+    --{{arg_key}} {{ arg_value }} \
+    {%- endfor %}{%- endif %}
+    --tag {{ cfg.tag }} \
+    .
+    {%- endif %}{% endfor %}

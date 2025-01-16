@@ -1,0 +1,37 @@
+package_name: {{ package_name }}
+
+dockerfile:
+    base:
+        from: "ros:humble"
+        tag: "{{ package_name }}_base:1.0"
+        cmd: ["bash"]
+        build: true
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+    devcontainer:
+        from: "{{ package_name }}_base:1.0"
+        tag: "{{ package_name }}_devcontainer:1.0"
+        cmd: ["bash"]
+        build: false
+    run:
+        from: "{{ package_name }}_base:1.0"
+        tag: "{{ package_name }}_run:1.0"
+        cmd: ["bash", "-c", "ros2 run {{ package_name }} node"]
+        build: true
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+
+ros_entrypoint:
+    source: ["/opt/ros/humble/setup.bash",
+            "/workspace/install/setup.bash"]
+
+devcontainer:
+    vscode:
+        extensions: ["ms-python.python",
+                    "ms-vscode.cpptools-extension-pack",
+                    "ms-vscode.cmake-tools",
+                    "redhat.vscode-xml",
+                    "mhutchie.git-graph",
+                    "ms-azuretools.vscode-docker",
+                    "mtsmfm.vscode-stl-viewer"]
+    packages: "curl,nano,python3-pip,git,ros-humble-rqt-graph,python3-vcstool"
