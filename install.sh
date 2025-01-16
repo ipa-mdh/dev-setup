@@ -178,8 +178,11 @@ function install_ros_deps {
 
 function clone_repos {
     rv=0
-    cd "$SCRIPT_DIR"
-    vcs import .. < ../.rosinstall
+    cd "$SCRIPT_DIR/.."
+    if [ -f '.rosinstall' ]; then
+      echo "Found .rosinstall file"
+      vcs import .. < .rosinstall
+    fi
     rv=$?
     cd -
     return $rv
