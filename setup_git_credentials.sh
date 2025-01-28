@@ -63,6 +63,16 @@ function handle_options {
 # Main script execution
 handle_options "$@"
 
+function check_git_installed {
+    if which git &> /dev/null; then
+        echo "Git is installed"
+    else
+        echo "Installing git"
+        apt update && apt install -y git
+    fi
+    return 0
+}
+
 function set_git_credentials {
     # echo "https://gitlab-ci-token:$CI_JOB_TOKEN@gitlab.com" > ~/.git-credentials
     # git config --global credential.helper store
@@ -78,7 +88,7 @@ function set_git_credentials {
 #     cat ~/.gitconfig
 
     rv=0
-
+    
     if [ -n "$GIT_CREDENTIALS_FILE" ]; then
         cp $GIT_CREDENTIALS_FILE ~/.git-credentials
         if [ $? -ne 0 ]; then
@@ -106,6 +116,7 @@ function set_git_credentials {
 
 error_counter=0
 commands=(
+    "check_git_installed"
     "set_git_credentials"
 )
 
