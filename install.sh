@@ -191,8 +191,8 @@ function clone_repos {
 error_counter=0
 commands=(
     "install_apt_deps"
-    "clone_repos"
     "install_pip_deps"
+    "clone_repos"
     "install_module_resources \"$PATH_PIP_SEARCH_FOLDER\""
     "install_ros_deps"
 )
