@@ -27,10 +27,9 @@
 		}{%- endif %}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [
-	// 	8080,
-	// 	8080
-	// ],
+	"forwardPorts": [
+	 	{%- if devcontainer.feature.desktop_lite %}6080{%- endif %}
+	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	//"postCreateCommand": "pip install open3d",
 	// Configure tool-specific properties.
@@ -47,10 +46,6 @@
 	},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
-	// "workspaceMount": "source=${localWorkspaceFolder},target=/ros2_ws/src/bp3_integration_test,type=bind",
 	"workspaceFolder": "/workspace",
-	// "mounts": [
-    // "source=${localEnv:HOME}/.git-credentials,target=/tmp/.git-credentials,type=bind,consistency=cached"
-	// ],
 	"postCreateCommand": "./src/{{ package_name }}/dev-setup/install.sh"
 }
