@@ -101,6 +101,11 @@ function install_pip_deps {
         echo "Error installing vcstool"
     fi
 
+    pip3 install loguru
+    if [ $? -ne 0 ]; then
+        echo "Error installing loguru"
+    fi
+
     return $rv
 }
 
