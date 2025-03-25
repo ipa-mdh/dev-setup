@@ -163,9 +163,7 @@ def main():
                 update_config_file = True
                 
         if update_config_file:
-            logger.debug(dev_setup_config)
             render_template(template_dir / dev_setup_template_filename, dev_setup_config, dev_setup_config_file)
-            
         
     else:
         if package_file.exists():
@@ -175,8 +173,6 @@ def main():
             dev_setup_config["package_name"] = package_name
             logger.warning(f"No package.xml file found. Using '{package_name}' as the package name.")
         render_template(template_dir / dev_setup_template_filename, dev_setup_config, dev_setup_config_file)
-
-    
     
     render_template_folder(templete_docker_dir, dev_setup_config, target_dir / "docker")
     render_template(template_dir / "devcontainer.json.j2", dev_setup_config, Path(".devcontainer/devcontainer.json"))
