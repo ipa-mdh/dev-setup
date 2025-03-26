@@ -13,6 +13,8 @@ templete_docker_dir = template_dir / "docker"
 dev_setup_config_file = Path(".dev-setup.yml")
 package_file = Path("package.xml")
 
+DEFAULT_ENVIRONEMNT = "ros.humble"
+
 def parse_arguments():
     # Create the argument parser
     parser = argparse.ArgumentParser(description="Setup script with package and environment settings.")
@@ -29,14 +31,14 @@ def parse_arguments():
         '--environment', 
         type=str, 
         choices=['ros.noetic', 'ros.humble', 'NiceGUI', 'debian'], 
-        default='ros.humble', 
+        default='', 
         help='The environment for the package (default: ros.humble)'
     )
     
     parser.add_argument(
-        '--vnc', 
+        '--desktop_lite', 
         action='store_true', 
-        help='Enable VNC (default: False)'
+        help='Enable desktop_lite for the devcontainer (default: False)'
     )
     
     parser.add_argument(
@@ -133,7 +135,7 @@ def main():
     # Display the parsed values
     logger.info(f"Package Name: {args.package_name}")
     logger.info(f"Environment: {args.environment}")
-    logger.info(f"VNC Enabled: {args.vnc}")
+    logger.info(f"desktop_lite Enabled: {args.desktop_lite}")
     logger.info(f"All yes: {args.yes}")
     
     # exit()
@@ -152,20 +154,44 @@ def main():
             dev_setup_config = yaml.safe_load(f)
             
             if package_name != "new_package":
+                # package_name is not the default
                 if dev_setup_config['package_name'] != args.package_name:
                     logger.warning(f"The package name in the configuration file differs from the dev-setup argument. {dev_setup_config['package_name']} -> {args.package_name }")
-                    dev_setup_config['package_name'] = ask_for_update('package_name', dev_setup_config['package_name'], args.package_name, args.yes)
+                    dev_setup_config['package_name'] = ask_for_update('package_name',
+                                                                      dev_setup_config['package_name'],
+                                                                      args.package_name,
+                                                                      args.yes)
                     update_config_file = True
             
-            if dev_setup_config['environment'] != args.environment:
-                logger.warning("The environment in the configuration file differs from the dev-setup argument.")
-                dev_setup_config['environment'] = ask_for_update('environment', dev_setup_config['environment'], args.environment,args.yes)
+            if args.environment != '':
+                if dev_setup_config['environment'] != args.environment:
+                    logger.warning("The environment in the configuration file differs from the dev-setup argument.")
+                    dev_setup_config['environment'] = ask_for_update('environment',
+                                                                    dev_setup_config['environment'],
+                                                                    args.environment,
+                                                                    args.yes)
+                    update_config_file = True
+            
+            if dev_setup_config['devcontainer']['feature']['desktop_lite'] != args.desktop_lite:
+                logger.warning("The desktop_lite feature in the configuration file differs from the dev-setup argument.")
+                dev_setup_config['devcontainer']['feature']['desktop_lite'] = ask_for_update('desktop_lite',
+                                                                                             dev_setup_config['devcontainer']['feature']['desktop_lite'],
+                                                                                             args.desktop_lite,
+                                                                                             args.yes)
+                logger.debug(dev_setup_config)
                 update_config_file = True
-                
+            
         if update_config_file:
             render_template(template_dir / dev_setup_template_filename, dev_setup_config, dev_setup_config_file)
         
     else:
+        if args.environment != '':
+            dev_setup_config['environment'] = args.environment
+        else:
+            dev_setup_config['environment'] = DEFAULT_ENVIRONEMNT
+        
+        dev_setup_config.update({'devcontainer': {'feature': {'desktop_lite': args.desktop_lite}}})
+        
         if package_file.exists():
             package_name = get_package_name(package_file)
             dev_setup_config["package_name"] = package_name
@@ -173,6 +199,9 @@ def main():
             dev_setup_config["package_name"] = package_name
             logger.warning(f"No package.xml file found. Using '{package_name}' as the package name.")
         render_template(template_dir / dev_setup_template_filename, dev_setup_config, dev_setup_config_file)
+    
+    with open(dev_setup_config_file) as f:
+        dev_setup_config = yaml.safe_load(f)
     
     render_template_folder(templete_docker_dir, dev_setup_config, target_dir / "docker")
     render_template(template_dir / "devcontainer.json.j2", dev_setup_config, Path(".devcontainer/devcontainer.json"))

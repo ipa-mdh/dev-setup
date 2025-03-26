@@ -37,4 +37,4 @@ devcontainer:
                     "mtsmfm.vscode-stl-viewer"]
     feature:
         packages: "ssh,curl,nano,python3-pip,git"
-        desktop_lite: false
+        desktop_lite: "{{ devcontainer.feature.desktop_lite }}"
