@@ -30,7 +30,7 @@ def parse_arguments():
     parser.add_argument(
         '--environment', 
         type=str, 
-        choices=['ros.noetic', 'ros.humble', 'NiceGUI', 'debian'], 
+        choices=['ros.noetic', 'ros.humble', 'debian'], 
         default='', 
         help='The environment for the package (default: ros.humble)'
     )

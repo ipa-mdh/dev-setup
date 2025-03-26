@@ -35,6 +35,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 SHELL ["/bin/bash", "-c"]
 
 # Set entry point for ROS
-COPY dev-setup/ros_entrypoint.sh /
-ENTRYPOINT ["/ros_entrypoint.sh"]
+COPY dev-setup/entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
 CMD {{ dockerfile.base.cmd }}

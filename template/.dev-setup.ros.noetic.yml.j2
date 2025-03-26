@@ -22,7 +22,7 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
 
-ros_entrypoint:
+entrypoint:
     source: ["/opt/ros/noetic/setup.bash",
             "/workspace/install/setup.bash"]
 
