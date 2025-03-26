@@ -96,7 +96,7 @@ function install_apt_deps {
 
 function install_pip_deps {
     rv=0
-    pip3 install vcstool
+    pip3 install vcstool --break-system-packages
     if [ $? -ne 0 ]; then
         echo "Error installing vcstool"
     fi
@@ -148,7 +148,7 @@ function install_module_resources {
                             echo "Checking file: $filename"
                             if [ "$module" == "$filename" ]; then
                                 echo "Installing from $file"
-                                pip3 install -r "$file"
+                                pip3 install -r "$file" --break-system-packages
                                 if [ $? -ne 0 ]; then
                                     rv=$rv+1
                                 fi
@@ -177,8 +177,18 @@ function install_module_resources {
 }
 
 function install_ros_deps {
-    rosdep install --from-paths src --ignore-src -r -y
-    rv=$?
+    command rosdep
+    installed=$?
+    if [ $installed = '0' ]; then
+        echo "rosdep is installed"
+        rosdep install --from-paths src --ignore-src -r -y
+        rv=$?
+    else
+        echo "rosdep is not installed"
+        rv=0
+    fi
+
+    return $rv
 }
 
 function clone_repos {
