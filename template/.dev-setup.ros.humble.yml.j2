@@ -6,19 +6,19 @@ dockerfile:
         from: "ros:humble"
         tag: "{{ package_name }}_base:1.0"
         cmd: ["bash"]
-        build: true
+        build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
     devcontainer:
         from: "{{ package_name }}_base:1.0"
         tag: "{{ package_name }}_devcontainer:1.0"
         cmd: ["bash"]
-        build: false
+        build: False
     run:
         from: "{{ package_name }}_base:1.0"
         tag: "{{ package_name }}_run:1.0"
         cmd: ["bash", "-c", "ros2 run {{ package_name }} node"]
-        build: true
+        build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
 
