@@ -6,9 +6,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERBOSE_MODE=false
 KEEP_GIT_CREDENTIALS_FILE=false
 PATH_PIP_SEARCH_FOLDER="./src"
+PATH_VCS_WORKING_DIRECTORY="./src"
 
 # Function to display script usage
 function usage {
+    echo "Execute this script to install dependencies for the project."
+    echo "This script sould be run from the root of the workspace."
+    echo ""
     echo "Usage: $0 [OPTIONS]"
     echo "Options:"
     echo " -h, --help                     Display this help message"
@@ -19,15 +23,38 @@ function usage {
     echo " --path-pip-search-folder       path to search for directories matching the pattern 'module/resource/module' (default: ./src, if not exists, does not search)"
 }
 
+# Function to check if an argument is provided
+# Arguments:
+#   $1: The argument to check
+#   $2: The value to check against (optional)
+# Returns:
+#   0 if the argument is provided, 1 otherwise
+# Usage:
+#   has_argument --option=value
+#   has_argument --option
+#   has_argument --option value
 function has_argument {
     [[ ("$1" == *=* && -n ${1#*=}) || ( ! -z "$2" && "$2" != -*)  ]];
 }
 
+# Function to extract the argument value
+# Arguments:
+#   $1: The argument to extract from
+#   $2: The value to extract (optional)
+# Returns:
+#   The extracted value
+# Usage:
+#   extract_argument --option=value
+#   extract_argument --option
 function extract_argument {
   echo "${2:-${1#*=}}"
 }
 
 # Function to handle options and arguments
+# Arguments:
+#   $1: The options and arguments to handle
+# Returns:
+#   None
 function handle_options {
   while [ $# -gt 0 ]; do
     case $1 in
@@ -194,10 +221,14 @@ function install_ros_deps {
 function clone_repos {
     rv=0
     cd "$SCRIPT_DIR/.."
-    if [ -f '.rosinstall' ]; then
-      echo "Found .rosinstall file"
-      vcs import .. < .rosinstall
-    fi
+    find . -type f -name ".rosinstall" | while read -r rosinstall_path; do
+        rosinstall_dir=$(dirname "$rosinstall_path")
+        echo "Running 'vcs import $PATH_VCS_WORKING_DIRECTORY in: $rosinstall_dir"
+        
+        # Change to the directory containing the .rosinstall file
+        (cd "$rosinstall_dir" && vcs import $PATH_VCS_WORKING_DIRECTORY < .rosinstall)
+    done
+
     rv=$?
     cd -
     return $rv
