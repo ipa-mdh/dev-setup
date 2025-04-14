@@ -123,7 +123,7 @@ function install_apt_deps {
 
 function install_pip_deps {
     rv=0
-    pip3 install vcstool --break-system-packages
+    pip3 install vcstool
     if [ $? -ne 0 ]; then
         echo "Error installing vcstool"
     fi
@@ -204,7 +204,7 @@ function install_module_resources {
 }
 
 function install_ros_deps {
-    command rosdep
+    command -v rosdep > /dev/null 2>&1
     installed=$?
     if [ $installed = '0' ]; then
         echo "rosdep is installed"
