@@ -3,7 +3,7 @@ environment: {{ environment }}
 
 dockerfile:
     base:
-        from: "ros:humble"
+        from: "debian:12"
         tag: "{{ package_name }}_base:1.0"
         cmd: ["bash"]
         build: True
@@ -17,14 +17,10 @@ dockerfile:
     run:
         from: "{{ package_name }}_base:1.0"
         tag: "{{ package_name }}_run:1.0"
-        cmd: ["bash", "-c", "ros2 run {{ package_name }} node"]
+        cmd: ["bash", "-c", "roslaunch {{ package_name }} node"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
-
-entrypoint:
-    source: ["/opt/ros/humble/setup.bash",
-            "/workspace/install/setup.bash"]
 
 devcontainer:
     vscode:
@@ -34,9 +30,7 @@ devcontainer:
                     "redhat.vscode-xml",
                     "mhutchie.git-graph",
                     "ms-azuretools.vscode-docker",
-                    "mtsmfm.vscode-stl-viewer",
-                    "doxygen",
-                ]
+                    "mtsmfm.vscode-stl-viewer"]
     feature:
         packages: "ssh,curl,nano,python3-pip,git"
-        desktop_lite: "{{ devcontainer.feature.desktop_lite }}"
+        desktop_lite: {{ devcontainer.feature.desktop_lite }}

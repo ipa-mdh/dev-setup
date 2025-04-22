@@ -1,28 +1,47 @@
-package_name: {{ package_name }}
-environment: {{ environment }}
+package_name: "test_pkg"
+environment: "ros.noetic"
+version: "0.0.1"
+
+docker:
+    registry:
+        url: "container-registry.gitlab.cc-asp.fraunhofer.de"
+        path: "test_pkg"
 
 dockerfile:
     base:
         from: "ros:noetic"
-        tag: "{{ package_name }}_base:1.0"
+        tag: "{{ package_name }}:base-{{ version }}"
         cmd: ["bash"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "{{ docker.registry.url }}/{{ docker.registry.path }}:base-{{ version }}"
     devcontainer:
-        from: "{{ package_name }}_base:1.0"
-        tag: "{{ package_name }}_devcontainer:1.0"
+        from: "{{ package_name }}:base-{{ version }}"
+        tag: "{{ package_name }}_devcontainer:{{ version }}"
         cmd: ["bash"]
         build: False
+    ci:
+        from: "{{ package_name }}:base-{{ version }}"
+        tag: "{{ package_name }}:ci-{{ version }}"
+        cmd: ["bash"]
+        build: True
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "{{ docker.registry.url }}/{{ docker.registry.path }}:ci-{{ version }}"
+        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
     run:
-        from: "{{ package_name }}_base:1.0"
-        tag: "{{ package_name }}_run:1.0"
+        from: "{{ package_name }}:base-{{ version }}"
+        tag: "{{ package_name }}:run-{{ version }}"
         cmd: ["bash", "-c", "roslaunch {{ package_name }} node"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
+        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
 
-ros_entrypoint:
+entrypoint:
     source: ["/opt/ros/noetic/setup.bash",
             "/workspace/install/setup.bash"]
 
@@ -34,7 +53,9 @@ devcontainer:
                     "redhat.vscode-xml",
                     "mhutchie.git-graph",
                     "ms-azuretools.vscode-docker",
-                    "mtsmfm.vscode-stl-viewer"]
+                    "mtsmfm.vscode-stl-viewer",
+                    "cschlosser.doxdocgen",
+                ]
     feature:
-        packages: "ssh,curl,nano,python3-pip,git"
-        desktop_lite: {{ devcontainer.feature.desktop_lite }}
+        packages: "ssh,curl,nano,python3-pip,git,doxygen"
+        desktop_lite: False

@@ -9,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 target_dir = Path(".dev-setup")
 template_dir = Path("dev-setup/template")
 templete_docker_dir = template_dir / "docker"
+templete_ci_cd_dir = template_dir / "ci-cd"
 
 dev_setup_config_file = Path(".dev-setup.yml")
 package_file = Path("package.xml")
@@ -30,7 +31,7 @@ def parse_arguments():
     parser.add_argument(
         '--environment', 
         type=str, 
-        choices=['ros.noetic', 'ros.humble', 'NiceGUI', 'debian'], 
+        choices=['ros.noetic', 'ros.humble', 'debian'], 
         default='', 
         help='The environment for the package (default: ros.humble)'
     )
@@ -54,6 +55,7 @@ def parse_arguments():
     return args
 
 def render_template(file: Path, variables: dict, targtet: Path):
+    logger.info(f"Rendering template: {file} to {targtet}")
     # Load the Jinja2 template   
     env = Environment(loader=FileSystemLoader(file.parent))
     template = env.get_template(file.name)
@@ -149,7 +151,6 @@ def main():
         logger.info(f"Variables file 'variables_file' found.")
         
         # Load the variables file
-        update_config_file = False
         with open(dev_setup_config_file) as f:
             dev_setup_config = yaml.safe_load(f)
             
@@ -161,7 +162,6 @@ def main():
                                                                       dev_setup_config['package_name'],
                                                                       args.package_name,
                                                                       args.yes)
-                    update_config_file = True
             
             if args.environment != '':
                 if dev_setup_config['environment'] != args.environment:
@@ -170,7 +170,6 @@ def main():
                                                                     dev_setup_config['environment'],
                                                                     args.environment,
                                                                     args.yes)
-                    update_config_file = True
             
             if dev_setup_config['devcontainer']['feature']['desktop_lite'] != args.desktop_lite:
                 logger.warning("The desktop_lite feature in the configuration file differs from the dev-setup argument.")
@@ -178,13 +177,11 @@ def main():
                                                                                              dev_setup_config['devcontainer']['feature']['desktop_lite'],
                                                                                              args.desktop_lite,
                                                                                              args.yes)
-                logger.debug(dev_setup_config)
-                update_config_file = True
-            
-        if update_config_file:
-            render_template(template_dir / dev_setup_template_filename, dev_setup_config, dev_setup_config_file)
         
     else:
+        with open(template_dir / dev_setup_template_filename) as f:
+            dev_setup_config = yaml.safe_load(f)
+            
         if args.environment != '':
             dev_setup_config['environment'] = args.environment
         else:
@@ -198,12 +195,16 @@ def main():
         else:
             dev_setup_config["package_name"] = package_name
             logger.warning(f"No package.xml file found. Using '{package_name}' as the package name.")
+            
         render_template(template_dir / dev_setup_template_filename, dev_setup_config, dev_setup_config_file)
+    logger.debug(f"Variables: {dev_setup_config}")
     
+    dev_setup_config = {}
     with open(dev_setup_config_file) as f:
         dev_setup_config = yaml.safe_load(f)
     
     render_template_folder(templete_docker_dir, dev_setup_config, target_dir / "docker")
+    render_template_folder(templete_ci_cd_dir, dev_setup_config, target_dir.parent)
     render_template(template_dir / "devcontainer.json.j2", dev_setup_config, Path(".devcontainer/devcontainer.json"))
 
 if __name__ == "__main__":
