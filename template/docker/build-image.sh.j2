@@ -4,9 +4,14 @@
     {%- if cfg.build %}
 docker build --file .dev-setup/docker/Dockerfile.{{ key }} \
     {%- if cfg.build_arguments is defined %}
-    {%- for arg_key, arg_value in cfg.build_arguments.items() %}
+        {%- for arg_key, arg_value in cfg.build_arguments.items() %}
     --{{arg_key}} {{ arg_value }} \
-    {%- endfor %}{%- endif %}
+        {%- endfor %}
+    {%- endif %}
     --tag {{ cfg.tag }} \
     .
-    {%- endif %}{% endfor %}
+    {%- endif %}
+    {%- if cfg.registry is defined %}
+docker tag {{ cfg.tag }} {{ cfg.registry.tag }}
+    {%- endif %}
+{%- endfor %}

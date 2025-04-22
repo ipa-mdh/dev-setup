@@ -9,11 +9,23 @@ dockerfile:
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "container-registry.gitlab.cc-asp.fraunhofer.de/multirobot/test:base-1.0"
     devcontainer:
         from: "{{ package_name }}_base:1.0"
         tag: "{{ package_name }}_devcontainer:1.0"
         cmd: ["bash"]
         build: False
+    ci:
+        from: "{{ dockerfile.base.registry.tag }}"
+        tag: "{{ package_name }}_ci:1.0"
+        cmd: ["bash", "-c", "roslaunch {{ package_name }} node"]
+        build: False
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "container-registry.gitlab.cc-asp.fraunhofer.de/multirobot/test:ci-1.0"
+        build_cmd: "source /opt/ros/noetic/setup.bash && catkin config --install && catkin build"
     run:
         from: "{{ package_name }}_base:1.0"
         tag: "{{ package_name }}_run:1.0"
@@ -21,6 +33,7 @@ dockerfile:
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
+        build_cmd: "source /opt/ros/noetic/setup.bash && catkin config --install && catkin build"
 
 entrypoint:
     source: ["/opt/ros/noetic/setup.bash",
@@ -34,7 +47,9 @@ devcontainer:
                     "redhat.vscode-xml",
                     "mhutchie.git-graph",
                     "ms-azuretools.vscode-docker",
-                    "mtsmfm.vscode-stl-viewer"]
+                    "mtsmfm.vscode-stl-viewer",
+                    "doxygen",
+                ]
     feature:
         packages: "ssh,curl,nano,python3-pip,git"
         desktop_lite: {{ devcontainer.feature.desktop_lite }}

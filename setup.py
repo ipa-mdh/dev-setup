@@ -9,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 target_dir = Path(".dev-setup")
 template_dir = Path("dev-setup/template")
 templete_docker_dir = template_dir / "docker"
+templete_ci_cd_dir = template_dir / "ci-cd"
 
 dev_setup_config_file = Path(".dev-setup.yml")
 package_file = Path("package.xml")
@@ -205,6 +206,7 @@ def main():
     
     render_template_folder(templete_docker_dir, dev_setup_config, target_dir / "docker")
     render_template(template_dir / "devcontainer.json.j2", dev_setup_config, Path(".devcontainer/devcontainer.json"))
+    render_template_folder(templete_ci_cd_dir, dev_setup_config, target_dir.parent)
 
 if __name__ == "__main__":
     main()
