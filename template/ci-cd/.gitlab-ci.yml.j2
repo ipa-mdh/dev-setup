@@ -6,47 +6,52 @@ variables:
 stages:
   - dependencies
   - build
-  # - test
+  - test
   - docs
-  # - deploy
+  - deploy
 
 .base_template: &base_definition
-  image: {{ dockerfile.base.registry.tag }}
-  before_script:
-    - mkdir -p "$PACKAGE_PATH"
-    - cp -r . "$PACKAGE_PATH"
-    - cd "$WORKSPACE_PATH"
+  image: container-registry.gitlab.cc-asp.fraunhofer.de/multirobot/test:ci-1.0
   cache:
     - key:
         files:
           - workspace.lock
       paths:
         - /workspace
+  tags:
+    - birlinghoven
 # ------------------------------ BEGIN STAGE: DEPENDENCIES ------------------------------
 
-install_dependencies:
+.install_template: &install_definition
   <<: *base_definition
   stage: dependencies
+  before_script:
+    - mkdir -p "$PACKAGE_PATH"
+    - cp -r . "$PACKAGE_PATH"
+    - cd "$WORKSPACE_PATH"
+
+install_dependencies:
+  <<: *install_definition
   script:
-    - bash "$PACKAGE_PATH"/setup_git_credentials.sh --use-ci-job-token
-    - bash "$PACKAGE_PATH"/install.sh
+    - bash "$PACKAGE_PATH"/dev-setup/setup_git_credentials.sh --use-ci-job-token
+    - bash "$PACKAGE_PATH"/dev-setup/install.sh
     - ls -la "$WORKSPACE_PATH"/src
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: DEPENDENCIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # --------------------------------- BEGIN STAGE: BUILD ---------------------------------
 
-.build_template: &build_definition
-  <<: *base_definition
-  stage: build
-  script:
-    - bash "$PACKAGE_PATH"/install.sh #todo: remove this line
+# .build_template: &build_definition
+#   <<: *base_definition
+#   stage: build
+#   script:
+#     - bash "$PACKAGE_PATH"/dev-setup/install.sh #todo: remove this line
 
-build:
-  <<: *build_definition
-  stage: build
-  script:
-    - {{ dockerfile.ci.build_cmd }}
+# build:
+#   <<: *build_definition
+#   stage: build
+#   script:
+#     - {{ dockerfile.ci.build_cmd }}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: BUILD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -54,15 +59,16 @@ build:
 .docs_template: &docs_definition
   <<: *base_definition
   stage: docs
-  artifacts:
-    paths:
-    - public
 
 pages:
   <<: *docs_definition
-  stage: docs
+  script:
+  - rm -rf doxygen/documentation
   - doxygen doxygen/Doxyfile
-  - mv doxygen/documentation/html/ public/
+  - mv doxygen/documentation/html doxygen/documentation/public
+  artifacts:
+    paths:
+    - doxygen/documentation/public
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: DOCS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

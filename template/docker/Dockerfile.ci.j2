@@ -15,23 +15,9 @@ COPY . /workspace/src/{{ package_name }}
 # Set the working directory back to workspace
 WORKDIR /workspace
 
-# # Make sure the install and setup scripts are executable
-# RUN chmod +x /workspace/src/{{ package_name }}/dev-setup/install.sh
-# RUN chmod +x /workspace/src/{{ package_name }}/dev-setup/setup_git_credentials.sh
-
-# # Run the installation script
-# RUN ./src/{{ package_name }}/dev-setup/ --use-ci-job-token
-# RUN ./src/{{ package_name }}/dev-setup/install.sh
-# RUN rm -rf ~/.git-credentials
-
-# # Build the workspace
-# RUN {{ dockerfile.ci.build_cmd }}
-
-# # Clean up apt cache and reduce image size
-# RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# # Delete the workspace folder after installation, except for the install folder, to clean up
-# RUN rm -rf /workspace/src /workspace/build /workspace/log
+RUN apt update
+RUN apt install doxygen -y
+RUN apt install graphviz -y
 
 # Run the main launch file
 CMD {{ dockerfile.ci.cmd }}
