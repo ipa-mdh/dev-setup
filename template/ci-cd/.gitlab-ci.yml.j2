@@ -11,7 +11,7 @@ stages:
   # - deploy
 
 .base_template: &base_definition
-  image: {{ dockerfile.ci.registry.tag }}
+  image: {{ dockerfile.base.registry.tag }}
   before_script:
     - mkdir -p "$PACKAGE_PATH"
     - cp -r . "$PACKAGE_PATH"

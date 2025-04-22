@@ -1,6 +1,10 @@
 package_name: {{ package_name }}
 environment: {{ environment }}
 
+docker:
+    registry:
+        url: "container-registry.gitlab.cc-asp.fraunhofer.de"
+
 dockerfile:
     base:
         from: "ros:noetic"
@@ -17,15 +21,15 @@ dockerfile:
         cmd: ["bash"]
         build: False
     ci:
-        from: "{{ dockerfile.base.registry.tag }}"
+        from: "{{ package_name }}_base:1.0"
         tag: "{{ package_name }}_ci:1.0"
         cmd: ["bash", "-c", "roslaunch {{ package_name }} node"]
-        build: False
+        build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
             tag: "container-registry.gitlab.cc-asp.fraunhofer.de/multirobot/test:ci-1.0"
-        build_cmd: "source /opt/ros/noetic/setup.bash && catkin config --install && catkin build"
+        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
     run:
         from: "{{ package_name }}_base:1.0"
         tag: "{{ package_name }}_run:1.0"
@@ -33,7 +37,7 @@ dockerfile:
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
-        build_cmd: "source /opt/ros/noetic/setup.bash && catkin config --install && catkin build"
+        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
 
 entrypoint:
     source: ["/opt/ros/noetic/setup.bash",

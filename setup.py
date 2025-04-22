@@ -55,6 +55,8 @@ def parse_arguments():
     return args
 
 def render_template(file: Path, variables: dict, targtet: Path):
+    logger.info(f"Rendering template: {file} to {targtet}")
+    logger.debug(f"Variables: {variables}")
     # Load the Jinja2 template   
     env = Environment(loader=FileSystemLoader(file.parent))
     template = env.get_template(file.name)

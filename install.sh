@@ -175,7 +175,7 @@ function install_module_resources {
                             echo "Checking file: $filename"
                             if [ "$module" == "$filename" ]; then
                                 echo "Installing from $file"
-                                pip3 install -r "$file" --break-system-packages
+                                pip3 install -r "$file"
                                 if [ $? -ne 0 ]; then
                                     rv=$rv+1
                                 fi

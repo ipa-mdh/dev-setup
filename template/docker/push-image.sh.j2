@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker login {{ docker.registry }}
+docker login {{ docker.registry.url }}
 
 {% for key, cfg in dockerfile.items() %}
     {%- if cfg.registry is defined %}

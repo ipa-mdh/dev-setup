@@ -10,8 +10,8 @@ docker build --file .dev-setup/docker/Dockerfile.{{ key }} \
     {%- endif %}
     --tag {{ cfg.tag }} \
     .
-    {%- endif %}
-    {%- if cfg.registry is defined %}
+        {%- if cfg.registry is defined %}
 docker tag {{ cfg.tag }} {{ cfg.registry.tag }}
+        {%- endif %}
     {%- endif %}
 {%- endfor %}
