@@ -25,8 +25,8 @@ RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
 RUN ./src/{{ package_name }}/dev-setup/install.sh
 RUN rm -rf ~/.git-credentials
 
-# Source the ROS 2 setup and build the workspace
-RUN source /opt/ros/humble/setup.bash && colcon build
+# Build the workspace
+RUN {{ dockerfile.run.build_cmd }}
 
 # Clean up apt cache and reduce image size
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

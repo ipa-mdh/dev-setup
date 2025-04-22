@@ -36,5 +36,6 @@ SHELL ["/bin/bash", "-c"]
 
 # Set entry point for ROS
 COPY .dev-setup/docker/entrypoint.sh /
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD {{ dockerfile.base.cmd }}

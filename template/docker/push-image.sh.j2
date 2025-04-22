@@ -1,0 +1,8 @@
+#!/bin/bash
+
+docker login {{ docker.registry.url }}
+
+{% for key, cfg in dockerfile.items() %}
+    {%- if cfg.registry is defined %}
+docker push {{ cfg.registry.tag }}
+    {%- endif %}{% endfor %}
