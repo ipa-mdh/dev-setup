@@ -1,25 +1,26 @@
 package_name: "{{ args.package_name }}"
 environment: "{{ args.environment }}"
-version: "{{ args.version | default('0.0.1') }}"
+version: "1.0"
 
 docker:
     registry:
         url: "container-registry.gitlab.cc-asp.fraunhofer.de"
+        path: "multirobot"
 
 
 dockerfile:
     base:
         from: "ros:humble"
-        tag: "{{ args.package_name }}_base:1.0"
+        tag: "{{ args.package_name }}_base:{{ args.version }}"
         cmd: ["bash"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:base-{{ args.version }}"
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:base-{{ args.version }}"
     devcontainer:
-        from: "{{ args.package_name }}_base:1.0"
-        tag: "{{ args.package_name }}_devcontainer:1.0"
+        from: "{{ args.package_name }}_base:{{ args.version }}"
+        tag: "{{ args.package_name }}_devcontainer:{{ args.version }}"
         cmd: ["bash"]
         build: False
     ci:
@@ -30,11 +31,11 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:ci-{{ args.version }}"
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
         build_cmd: "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
     run:
-        from: "{{ args.package_name }}_base:1.0"
-        tag: "{{ args.package_name }}_run:1.0"
+        from: "{{ args.package_name }}_base:{{ args.version }}"
+        tag: "{{ args.package_name }}_run:{{ args.version }}"
         cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
         build: True
         build_arguments:
