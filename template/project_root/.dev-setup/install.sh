@@ -269,17 +269,24 @@ function install_ros_deps {
 
 function clone_repos {
     rv=0
-    cd "$SCRIPT_DIR/.."
-    find . -type f -name ".rosinstall" | while read -r rosinstall_path; do
-        rosinstall_dir=$(dirname "$rosinstall_path")
-        echo "Running 'vcs import $PATH_VCS_WORKING_DIRECTORY in: $rosinstall_dir"
-        
-        # Change to the directory containing the .rosinstall file
-        (cd "$rosinstall_dir" && vcs import $PATH_VCS_WORKING_DIRECTORY < .rosinstall)
-    done
+    # cd "$SCRIPT_DIR/.."
+    # Check if src directory exists
+    if [ ! -d "$PATH_VCS_WORKING_DIRECTORY" ]; then
+        echo "Directory $PATH_VCS_WORKING_DIRECTORY does not exist. This script should be run from the root of the workspace."
+        rv=1
+    else
+        cd "$PATH_VCS_WORKING_DIRECTORY"
 
+        find . -type f -name ".rosinstall" | while read -r rosinstall_path; do
+            rosinstall_dir=$(dirname "$rosinstall_path")
+            echo "Running 'vcs import in: $PATH_VCS_WORKING_DIRECTORY"
+            
+            # Change to the directory containing the .rosinstall file
+            vcs import . < "$rosinstall_dir/.rosinstall"
+        done
+        cd -
+    fi
     rv=$?
-    cd -
     return $rv
 }
 

@@ -41,19 +41,12 @@
 				"editor.formatOnSave": true,
 				"terminal.integrated.profiles.linux": {
 					"bash-robot-mindset": {
-					"path": "/bin/bash",
-					"args": ["/entrypoint.sh", "bash"]
-					}
+						"path": "/bin/bash",
+						"args": ["/entrypoint.sh", "bash"]
+						}
 				},
 				"terminal.integrated.defaultProfile.linux": "bash-robot-mindset"
 			},
-			"terminal.integrated.profiles.linux": {
-				"bash-login": {
-				"path": "/bin/bash",
-				"args": ["-l"]
-				}
-			},
-			"terminal.integrated.defaultProfile.linux": "bash-login"
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": {{ args.devcontainer.vscode.extensions | tojson }}
 		}
