@@ -42,8 +42,9 @@ dockerfile:
         build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
 
 entrypoint:
-    source: ["/opt/ros/noetic/setup.bash",
-            "/workspace/install/setup.bash"]
+    source: ["/workspace/venv/bin/activate",
+             "/opt/ros/noetic/setup.bash",
+             "/workspace/install/setup.bash"]
 
 devcontainer:
     vscode:

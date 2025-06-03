@@ -41,8 +41,9 @@ dockerfile:
             secret: id=gitcreds,src=$HOME/.git-credentials
 
 entrypoint:
-    source: ["/opt/ros/humble/setup.bash",
-            "/workspace/install/setup.bash"]
+    source: ["/workspace/venv/bin/activate",
+             "/opt/ros/humble/setup.bash",
+             "/workspace/install/setup.bash"]
 
 devcontainer:
     vscode:

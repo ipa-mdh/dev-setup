@@ -7,6 +7,7 @@ VERBOSE_MODE=false
 KEEP_GIT_CREDENTIALS_FILE=false
 PATH_PIP_SEARCH_FOLDER="./src"
 PATH_VCS_WORKING_DIRECTORY="./src"
+PIP_VENV_NAME="venv"
 
 # Function to display script usage
 function usage {
@@ -21,6 +22,7 @@ function usage {
     echo " --keep-git-credentials-file    keep git credentials file (default: does not keep)"
     echo " --use-ci-job-token             use CI_JOB_TOKEN as password"
     echo " --path-pip-search-folder       path to search for directories matching the pattern 'module/resource/module' (default: ./src, if not exists, does not search)"
+    echo " --pip-venv-name                name of the pip virtual environment (default: venv)"
 }
 
 # Function to check if an argument is provided
@@ -93,6 +95,17 @@ function handle_options {
 
         shift
         ;;
+      --pip-venv-name)
+        if ! has_argument $@; then
+          echo "Name not specified." >&2
+          usage
+          exit 1
+        fi
+
+        PIP_VENV_NAME=$(extract_argument $@)
+
+        shift
+        ;;
       *)
         echo "Invalid option: $1" >&2
         usage
@@ -109,6 +122,7 @@ handle_options "$@"
 # Perform the desired actions based on the provided flags and arguments
 if [ "$VERBOSE_MODE" = true ]; then
  echo "Verbose mode enabled."
+ set -x
 fi
 
 function install_apt_deps {
@@ -116,6 +130,7 @@ function install_apt_deps {
     apt update
     apt install -y \
         python3-pip \
+        python3-venv \
         git
     rv=$?
     return $rv
@@ -123,14 +138,48 @@ function install_apt_deps {
 
 function install_pip_deps {
     rv=0
-    pip3 install vcstool
-    if [ $? -ne 0 ]; then
-        echo "Error installing vcstool"
-    fi
+    packages=(
+        "vcstool"
+        "loguru"
+    )
 
-    pip3 install loguru
+    # create a virtual environment if it does not exist
+    if [ ! -d "$PIP_VENV_NAME" ]; then
+        python3 -m venv "$PIP_VENV_NAME"
+        if [ $? -ne 0 ]; then
+            echo "ERROR: Failed to create virtual environment $PIP_VENV_NAME"
+            return 1
+        fi
+    fi
+    # Activate the virtual environment
+    source "$PIP_VENV_NAME/bin/activate"
     if [ $? -ne 0 ]; then
-        echo "Error installing loguru"
+        echo "ERROR: Failed to activate virtual environment $PIP_VENV_NAME"
+        return 1
+    fi
+    # # Ensure pip is up to date
+    # pip3 install --upgrade pip
+    # if [ $? -ne 0 ]; then
+    #     echo "ERROR: Failed to upgrade pip"
+    #     return 1
+    # fi
+    # Initialize error counter
+    error_counter=0
+
+    # Loop over each package and install it
+    for pkg in "${packages[@]}"; do
+        pip3 install "$pkg"
+        if [ $? -ne 0 ]; then
+            error_counter=$(( error_counter + 1 ))
+            echo "ERROR: pip3 install $pkg"
+        fi
+    done
+
+    if [ $error_counter -ne 0 ]; then
+        echo "Error installing pip dependencies"
+        rv=1
+    else
+        echo "All pip dependencies installed successfully"
     fi
 
     return $rv

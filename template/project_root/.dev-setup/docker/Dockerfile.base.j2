@@ -16,8 +16,8 @@ COPY . /workspace/src/{{ args.package_name }}
 WORKDIR /workspace
 
 # Make sure the install and setup scripts are executable
-RUN chmod +x /workspace/src/{{ args.package_name }}/dev-setup/install.sh
-RUN chmod +x /workspace/src/{{ args.package_name }}/dev-setup/setup_git_credentials.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/install.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh
 
 # Run the installation script
 RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
