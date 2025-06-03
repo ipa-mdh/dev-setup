@@ -234,7 +234,20 @@ def main():
     dev_setup_config = {}
     package_name = args.package_name
     
-    dev_setup_template_filename = get_dev_setup_template_filename(args.environment)
+    if args.environment != '':
+        logger.debug(f"Using environment from command line argument: {args.environment}")
+        env = args.environment
+    else:
+        if dev_setup_config_file.exists():
+            with open(dev_setup_config_file) as f:
+                dev_setup_config = yaml.safe_load(f)
+                env = dev_setup_config.get('environment', DEFAULT_ENVIRONEMNT)
+                logger.debug(f"Environment from config file: {env}")
+        else:
+            env = DEFAULT_ENVIRONEMNT
+            logger.debug(f"No config file found. Using default environment: {env}")
+    
+    dev_setup_template_filename = get_dev_setup_template_filename(env)
     
     dev_setup_config = get_dev_setup_config(dev_setup_config_file, template_dir / dev_setup_template_filename)
     
