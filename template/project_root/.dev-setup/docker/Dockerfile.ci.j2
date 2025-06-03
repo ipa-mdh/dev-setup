@@ -4,13 +4,13 @@
 # -----------------------------------------------------------------------------
 
 # Use the image from the first file
-FROM {{ dockerfile.ci.from }}
+FROM {{ args.dockerfile.ci.from }}
 
 # Set the working directory
 WORKDIR /workspace/src
 
 # Copy the entire bp3_integration_test folder into the src folder of the workspace
-COPY . /workspace/src/{{ package_name }}
+COPY . /workspace/src/{{ args.package_name }}
 
 # Set the working directory back to workspace
 WORKDIR /workspace
@@ -20,4 +20,4 @@ RUN apt install doxygen -y
 RUN apt install graphviz -y
 
 # Run the main launch file
-CMD {{ dockerfile.ci.cmd }}
+CMD {{ args.dockerfile.ci.cmd }}

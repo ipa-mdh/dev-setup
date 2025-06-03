@@ -1,7 +1,7 @@
 
 variables:
   WORKSPACE_PATH: /workspace
-  PACKAGE_PATH: $WORKSPACE_PATH/src/{{ package_name }}
+  PACKAGE_PATH: $WORKSPACE_PATH/src/{{ args.package_name }}
 
 stages:
   - dependencies
@@ -51,7 +51,7 @@ install_dependencies:
 #   <<: *build_definition
 #   stage: build
 #   script:
-#     - {{ dockerfile.ci.build_cmd }}
+#     - {{ args.dockerfile.ci.build_cmd }}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: BUILD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

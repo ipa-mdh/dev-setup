@@ -1,23 +1,23 @@
-package_name: {{ package_name }}
-environment: {{ environment }}
+package_name: {{ args.package_name }}
+environment: {{ args.environment }}
 
 dockerfile:
     base:
         from: "debian:12"
-        tag: "{{ package_name }}_base:1.0"
+        tag: "{{ args.package_name }}_base:1.0"
         cmd: ["bash"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
     devcontainer:
-        from: "{{ package_name }}_base:1.0"
-        tag: "{{ package_name }}_devcontainer:1.0"
+        from: "{{ args.package_name }}_base:1.0"
+        tag: "{{ args.package_name }}_devcontainer:1.0"
         cmd: ["bash"]
         build: False
     run:
-        from: "{{ package_name }}_base:1.0"
-        tag: "{{ package_name }}_run:1.0"
-        cmd: ["bash", "-c", "roslaunch {{ package_name }} node"]
+        from: "{{ args.package_name }}_base:1.0"
+        tag: "{{ args.package_name }}_run:1.0"
+        cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
@@ -33,4 +33,4 @@ devcontainer:
                     "mtsmfm.vscode-stl-viewer"]
     feature:
         packages: "ssh,curl,nano,python3-pip,git"
-        desktop_lite: {{ devcontainer.feature.desktop_lite }}
+        desktop_lite: {{ args.devcontainer.feature.desktop_lite }}

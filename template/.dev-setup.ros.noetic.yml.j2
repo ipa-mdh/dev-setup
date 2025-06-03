@@ -10,32 +10,32 @@ docker:
 dockerfile:
     base:
         from: "ros:noetic"
-        tag: "{{ package_name }}:base-{{ version }}"
+        tag: "{{ args.package_name }}:base-{{ args.version }}"
         cmd: ["bash"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ docker.registry.url }}/{{ docker.registry.path }}:base-{{ version }}"
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:base-{{ args.version }}"
     devcontainer:
-        from: "{{ package_name }}:base-{{ version }}"
-        tag: "{{ package_name }}_devcontainer:{{ version }}"
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}_devcontainer:{{ args.version }}"
         cmd: ["bash"]
         build: False
     ci:
-        from: "{{ package_name }}:base-{{ version }}"
-        tag: "{{ package_name }}:ci-{{ version }}"
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:ci-{{ args.version }}"
         cmd: ["bash"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ docker.registry.url }}/{{ docker.registry.path }}:ci-{{ version }}"
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:ci-{{ args.version }}"
         build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
     run:
-        from: "{{ package_name }}:base-{{ version }}"
-        tag: "{{ package_name }}:run-{{ version }}"
-        cmd: ["bash", "-c", "roslaunch {{ package_name }} node"]
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:run-{{ args.version }}"
+        cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials

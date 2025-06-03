@@ -5,19 +5,19 @@
 
 
 # Use the image from the first file
-FROM {{ dockerfile.devcontainer.from }}
+FROM {{ args.dockerfile.devcontainer.from }}
 
 # Set the working directory
 WORKDIR /workspace/src
 
 # Copy the entire bp3_integration_test folder into the src folder of the workspace
-COPY . /workspace/src/{{ package_name }}
+COPY . /workspace/src/{{ args.package_name }}
 
 # Set the working directory back to workspace
 WORKDIR /workspace
 
 # Make sure the install script is executable
-RUN chmod +x /workspace/src/{{ package_name }}/dev-setup/install.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/install.sh
 
 # Run the main launch file
-CMD {{ dockerfile.devcontainer.cmd }}
+CMD {{ args.dockerfile.devcontainer.cmd }}

@@ -7,7 +7,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-	"name": "{{ package_name }}",
+	"name": "{{ args.package_name }}",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	// "image": "container-registry.gitlab.cc-asp.fraunhofer.de/320_project_km/interfaces/bp3-interface"
 	"build": {
@@ -18,8 +18,8 @@
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "{{ devcontainer.feature.packages }}" //,
-		},{%- if devcontainer.feature.desktop_lite %}
+			"packages": "{{ args.devcontainer.feature.packages }}" //,
+		},{%- if args.devcontainer.feature.desktop_lite %}
 		"desktop-lite": {
 			"password": "vscode",
 			"webPort": "6080",
@@ -28,7 +28,7 @@
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
-	 	{%- if devcontainer.feature.desktop_lite %}6080{%- endif %}
+	 	{%- if args.devcontainer.feature.desktop_lite %}6080{%- endif %}
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	//"postCreateCommand": "pip install open3d",
@@ -41,11 +41,11 @@
 				"editor.formatOnSave": true //,
 			},
 			// Add the IDs of extensions you want installed when the container is created.
-			"extensions": {{ devcontainer.vscode.extensions | tojson }}
+			"extensions": {{ args.devcontainer.vscode.extensions | tojson }}
 		}
 	},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 	"workspaceFolder": "/workspace",
-	"postCreateCommand": "./src/{{ package_name }}/dev-setup/install.sh"
+	"postCreateCommand": "./src/{{ args.package_name }}/dev-setup/install.sh"
 }

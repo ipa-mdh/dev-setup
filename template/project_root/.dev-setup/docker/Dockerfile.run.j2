@@ -4,29 +4,29 @@
 # -----------------------------------------------------------------------------
 
 # Use the image from the first file
-FROM {{ dockerfile.run.from }}
+FROM {{ args.dockerfile.run.from }}
 
 # Set the working directory
 WORKDIR /workspace/src
 
 # Copy the entire bp3_integration_test folder into the src folder of the workspace
-COPY . /workspace/src/{{ package_name }}
+COPY . /workspace/src/{{ args.package_name }}
 
 # Set the working directory back to workspace
 WORKDIR /workspace
 
 # Make sure the install and setup scripts are executable
-RUN chmod +x /workspace/src/{{ package_name }}/dev-setup/install.sh
-RUN chmod +x /workspace/src/{{ package_name }}/dev-setup/setup_git_credentials.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/install.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh
 
 # Run the installation script
 RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
-    ./src/{{ package_name }}/dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
-RUN ./src/{{ package_name }}/dev-setup/install.sh
+    ./src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
+RUN ./src/{{ args.package_name }}/.dev-setup/install.sh
 RUN rm -rf ~/.git-credentials
 
 # Build the workspace
-RUN {{ dockerfile.run.build_cmd }}
+RUN {{ args.dockerfile.run.build_cmd }}
 
 # Clean up apt cache and reduce image size
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -35,4 +35,4 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN rm -rf /workspace/src /workspace/build /workspace/log
 
 # Run the main launch file
-CMD {{ dockerfile.run.cmd }}
+CMD {{ args.dockerfile.run.cmd }}

@@ -1,23 +1,41 @@
-package_name: {{ package_name }}
-environment: {{ environment }}
+package_name: "{{ args.package_name }}"
+environment: "{{ args.environment }}"
+version: "{{ args.version | default('0.0.1') }}"
+
+docker:
+    registry:
+        url: "container-registry.gitlab.cc-asp.fraunhofer.de"
+
 
 dockerfile:
     base:
         from: "ros:humble"
-        tag: "{{ package_name }}_base:1.0"
+        tag: "{{ args.package_name }}_base:1.0"
         cmd: ["bash"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:base-{{ args.version }}"
     devcontainer:
-        from: "{{ package_name }}_base:1.0"
-        tag: "{{ package_name }}_devcontainer:1.0"
+        from: "{{ args.package_name }}_base:1.0"
+        tag: "{{ args.package_name }}_devcontainer:1.0"
         cmd: ["bash"]
         build: False
+    ci:
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:ci-{{ args.version }}"
+        cmd: ["bash"]
+        build: True
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:ci-{{ args.version }}"
+        build_cmd: "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
     run:
-        from: "{{ package_name }}_base:1.0"
-        tag: "{{ package_name }}_run:1.0"
-        cmd: ["bash", "-c", "ros2 run {{ package_name }} node"]
+        from: "{{ args.package_name }}_base:1.0"
+        tag: "{{ args.package_name }}_run:1.0"
+        cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
@@ -39,4 +57,4 @@ devcontainer:
                 ]
     feature:
         packages: "ssh,curl,nano,python3-pip,git"
-        desktop_lite: "{{ devcontainer.feature.desktop_lite }}"
+        desktop_lite: "{{ args.devcontainer.feature.desktop_lite | default(false) }}"

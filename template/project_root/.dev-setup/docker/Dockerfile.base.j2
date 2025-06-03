@@ -4,25 +4,25 @@
 # -----------------------------------------------------------------------------
 
 
-FROM {{ dockerfile.base.from }}
+FROM {{ args.dockerfile.base.from }}
 
 # Set the working directory
 WORKDIR /workspace/src
 
 # Copy the entire bp3_integration_test folder into the src folder of the workspace
-COPY . /workspace/src/{{ package_name }}
+COPY . /workspace/src/{{ args.package_name }}
 
 # Set the working directory back to workspace
 WORKDIR /workspace
 
 # Make sure the install and setup scripts are executable
-RUN chmod +x /workspace/src/{{ package_name }}/dev-setup/install.sh
-RUN chmod +x /workspace/src/{{ package_name }}/dev-setup/setup_git_credentials.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/dev-setup/install.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/dev-setup/setup_git_credentials.sh
 
 # Run the installation script
 RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
-    ./src/{{ package_name }}/dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
-RUN ./src/{{ package_name }}/dev-setup/install.sh
+    ./src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
+RUN ./src/{{ args.package_name }}/.dev-setup/install.sh
 RUN rm -rf ~/.git-credentials
 
 # Delete the workspace folder after installation to clean up
@@ -38,4 +38,4 @@ SHELL ["/bin/bash", "-c"]
 COPY .dev-setup/docker/entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-CMD {{ dockerfile.base.cmd }}
+CMD {{ args.dockerfile.base.cmd }}
