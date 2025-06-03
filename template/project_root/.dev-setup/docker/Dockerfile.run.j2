@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 
 # Use the image from the first file
-FROM {{ args.dockerfile.run.from }}
+FROM {{ args.dockerfile.run.from }} AS build
 
 # Set the working directory
 WORKDIR /workspace/src
@@ -22,7 +22,7 @@ RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/setup_git_credent
 # Run the installation script
 RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
     ./src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
-RUN ./src/{{ args.package_name }}/.dev-setup/install.sh
+RUN ./src/{{ args.package_name }}/.dev-setup/install.sh --pip-venv-path /opt/robot-mindset/venv
 RUN rm -rf ~/.git-credentials
 
 # Build the workspace
@@ -30,6 +30,19 @@ RUN {{ args.dockerfile.run.build_cmd }}
 
 # Clean up apt cache and reduce image size
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# -----------------------------------------------------------------------------
+# TODO: use multi-stage builds
+#        - copy workspace install folder
+#        - copy /opt/robot-mindset/venv
+#        - rosdep install + plain cmake / conan?
+#
+# FROM {{ args.dockerfile.base.from }}
+# COPY --from=build /workspace/install /workspace/install
+# COPY --from=build /opt/robot-mindset /opt/robot-mindset
+# COPY --from=build /opt/ros /opt/ros
+# RUN rosdep install --from-paths /workspace/install --ignore-src -r -y
+# -----------------------------------------------------------------------------
 
 # Delete the workspace folder after installation, except for the install folder, to clean up
 RUN rm -rf /workspace/src /workspace/build /workspace/log

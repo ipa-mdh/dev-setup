@@ -42,7 +42,7 @@ dockerfile:
             secret: id=gitcreds,src=$HOME/.git-credentials
 
 entrypoint:
-    source: ["/workspace/venv/bin/activate",
+    source: ["/opt/robot-mindset/venv/bin/activate",
              "/opt/ros/humble/setup.bash",
              "/workspace/install/setup.bash"]
 

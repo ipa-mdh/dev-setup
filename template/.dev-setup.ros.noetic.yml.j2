@@ -42,7 +42,7 @@ dockerfile:
         build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
 
 entrypoint:
-    source: ["/workspace/venv/bin/activate",
+    source: ["/opt/robot-mindset/venv/bin/activate",
              "/opt/ros/noetic/setup.bash",
              "/workspace/install/setup.bash"]
 

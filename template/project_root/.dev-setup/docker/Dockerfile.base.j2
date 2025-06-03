@@ -3,7 +3,6 @@
 # Do not edit directly; modify the template or input variables instead.
 # -----------------------------------------------------------------------------
 
-
 FROM {{ args.dockerfile.base.from }}
 
 # Set the working directory
@@ -22,7 +21,7 @@ RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/setup_git_credent
 # Run the installation script
 RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
     ./src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
-RUN ./src/{{ args.package_name }}/.dev-setup/install.sh
+RUN ./src/{{ args.package_name }}/.dev-setup/install.sh --pip-venv-path /opt/robot-mindset/venv
 RUN rm -rf ~/.git-credentials
 
 # Delete the workspace folder after installation to clean up
@@ -35,7 +34,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 SHELL ["/bin/bash", "-c"]
 
 # Set entry point for ROS
-COPY .dev-setup/docker/entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+COPY .dev-setup/docker/entrypoint.sh /opt/robot-mindset/
+RUN chmod +x /opt/robot-mindset/entrypoint.sh
+ENTRYPOINT ["/opt/robot-mindset/entrypoint.sh"]
 CMD {{ args.dockerfile.base.cmd }}
