@@ -28,8 +28,7 @@ dockerfile:
             secret: id=gitcreds,src=$HOME/.git-credentials
 
 entrypoint:
-    source: ["/opt/robot-mindset/venv/bin/activate",
-             "/opt/ros/humble/setup.bash",
+    source: ["/opt/ros/humble/setup.bash",
              "/workspace/install/setup.bash"]
 
 devcontainer:

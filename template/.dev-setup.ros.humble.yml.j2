@@ -7,11 +7,10 @@ docker:
         url: "container-registry.gitlab.cc-asp.fraunhofer.de"
         path: "multirobot"
 
-
 dockerfile:
     base:
         from: "ros:humble"
-        tag: "{{ args.package_name }}_base:{{ args.version }}"
+        tag: "{{ args.package_name }}:base-{{ args.version }}"
         cmd: ["bash"]
         build: True
         build_arguments:
@@ -19,8 +18,8 @@ dockerfile:
         registry:
             tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:base-{{ args.version }}"
     devcontainer:
-        from: "{{ args.package_name }}_base:{{ args.version }}"
-        tag: "{{ args.package_name }}_devcontainer:{{ args.version }}"
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
         cmd: ["bash"]
         build: False
     ci:
@@ -34,16 +33,15 @@ dockerfile:
             tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
         build_cmd: "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
     run:
-        from: "{{ args.package_name }}_base:{{ args.version }}"
-        tag: "{{ args.package_name }}_run:{{ args.version }}"
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:run-{{ args.version }}"
         cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
 
 entrypoint:
-    source: ["/opt/robot-mindset/venv/bin/activate",
-             "/opt/ros/humble/setup.bash",
+    source: ["/opt/ros/humble/setup.bash",
              "/workspace/install/setup.bash"]
 
 devcontainer:
