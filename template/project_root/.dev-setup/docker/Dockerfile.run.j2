@@ -22,7 +22,7 @@ RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/setup_git_credent
 # Run the installation script
 RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
     ./src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
-RUN ./src/{{ args.package_name }}/.dev-setup/install.sh --pip-venv-path /opt/robot-mindset/venv
+RUN ./src/{{ args.package_name }}/.dev-setup/install.sh
 RUN rm -rf ~/.git-credentials
 
 # Build the workspace
