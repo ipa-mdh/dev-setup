@@ -147,7 +147,7 @@ function install_pip_deps {
     fi
 
     # Install packages
-    pip3 install -r "$requirements_file"
+    pip3 install --break-system-packages -r "$requirements_file"
     if [ $? -ne 0 ]; then
         echo "ERROR: Failed to install pip dependencies from $requirements_file"
         rv=1
@@ -197,7 +197,7 @@ function install_module_resources {
                             echo "Checking file: $filename"
                             if [ "$module" == "$filename" ]; then
                                 echo "Installing from $file"
-                                pip3 install -r "$file"
+                                pip3 install --break-system-packages -r "$file"
                                 if [ $? -ne 0 ]; then
                                     rv=$rv+1
                                 fi
