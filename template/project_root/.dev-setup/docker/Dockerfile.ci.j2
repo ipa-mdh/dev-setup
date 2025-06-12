@@ -20,4 +20,4 @@ RUN apt install doxygen -y
 RUN apt install graphviz -y
 
 # Run the main launch file
-CMD {{ args.dockerfile.ci.cmd }}
+CMD {{ args.dockerfile.ci.cmd | replace("'", '"') }}
