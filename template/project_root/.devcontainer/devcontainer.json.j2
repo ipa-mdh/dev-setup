@@ -14,6 +14,16 @@
 		// Path is relative to the devcontainer.json file.
 		"dockerfile": "../.dev-setup/docker/Dockerfile.devcontainer",
 		"context": "..",
+		{%- if args.devcontainer.build is defined %}
+		{%- if args.devcontainer.build.args is defined %}
+		"args": {
+			{%- for key, value in args.devcontainer.build.args.items() %}
+			"{{ key }}": "{{ value }}"
+			{%- if not loop.last %},{%- endif %}
+			{%- endfor %}	
+		{%- endif %}
+		{%- endif %}
+		}
 	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
