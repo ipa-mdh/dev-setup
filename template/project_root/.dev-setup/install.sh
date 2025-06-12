@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Default variable values
 VERBOSE_MODE=false
 KEEP_GIT_CREDENTIALS_FILE=false
+PATH_CONAN_SEARCH_FOLDER="./src"
 PATH_PIP_SEARCH_FOLDER="./src"
 PATH_VCS_WORKING_DIRECTORY="./src"
 # PIP_VENV_PATH="venv"
@@ -263,12 +264,36 @@ function clone_repos {
     return $rv
 }
 
+function install_conan_packages {
+    rv=0
+    path=$1
+    if [ -d "$path" ]; then
+        # Find conanfiles in the specified path
+        find "$path" -type f \( -name "conanfile.txt" -o -name "conanfile.py" \) | while read -r conanfile; do
+            # check if a install.sh file exists in the same directory
+            install_script="$(dirname "$conanfile")/install.sh"
+            if [ -f "$install_script" ]; then
+                echo "Running install script: $install_script"
+                bash "$install_script"
+                if [ $? -ne 0 ]; then
+                    rv=$((rv + 1))
+                fi
+            fi
+        done
+    else
+        echo "No directory found at $path"
+        ls -l
+        rv=1
+    fi
+}
+
 error_counter=0
 commands=(
     "install_apt_deps"
     "install_pip_deps"
     "clone_repos"
     "install_module_resources \"$PATH_PIP_SEARCH_FOLDER\""
+    "install_conan_packages \"$PATH_CONAN_SEARCH_FOLDER\""
     "install_ros_deps"
 )
 
