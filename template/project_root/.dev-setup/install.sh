@@ -256,7 +256,7 @@ function clone_repos {
             echo "Running 'vcs import in: $PATH_VCS_WORKING_DIRECTORY"
             
             # Change to the directory containing the .rosinstall file
-            vcs import . < "$rosinstall_dir/.rosinstall"
+            vcs import . < "$rosinstall_dir/.rosinstall" --recursive
         done
         cd -
     fi
