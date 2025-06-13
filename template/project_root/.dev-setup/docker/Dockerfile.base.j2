@@ -37,4 +37,4 @@ SHELL ["/bin/bash", "-c"]
 COPY .dev-setup/docker/entrypoint.sh /opt/robot-mindset/
 RUN chmod +x /opt/robot-mindset/entrypoint.sh
 ENTRYPOINT ["/opt/robot-mindset/entrypoint.sh"]
-CMD {{ args.dockerfile.base.cmd }}
+CMD {{ args.dockerfile.base.cmd | replace("'", '"') }}

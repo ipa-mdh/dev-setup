@@ -147,7 +147,22 @@ function install_pip_deps {
     fi
 
     # Install packages
-    pip3 install --break-system-packages -r "$requirements_file"
+    # Get the pip version
+    pip_version=$(pip3 --version | awk '{print $2}')
+
+    # Function to compare versions
+    version_gte() {
+        # returns 0 (true) if $1 >= $2
+        [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
+    }
+
+    # The version where --break-system-packages was introduced
+    required_version="23.1"
+    if version_gte "$pip_version" "$required_version"; then
+        pip3 install --break-system-packages -r "$requirements_file"
+    else
+        pip3 install -r "$requirements_file"
+    fi
     if [ $? -ne 0 ]; then
         echo "ERROR: Failed to install pip dependencies from $requirements_file"
         rv=1
