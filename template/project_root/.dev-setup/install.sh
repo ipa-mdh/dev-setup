@@ -164,7 +164,8 @@ function check_pip_version_use_break_system_packages {
     # last version without --break-system-packages option
     # https://pip.pypa.io/en/stable/news/#v23-0-1
     required_version="23.0.1"
-    if check_version_greater_equal "$pip_version" "$required_version"; then
+    check_version_greater_equal "$pip_version" "$required_version"
+    if [ $? -eq 1 ]; then
         echo "Pip version is $pip_version, which is greater than or equal to $required_version"
         return 1
     else
