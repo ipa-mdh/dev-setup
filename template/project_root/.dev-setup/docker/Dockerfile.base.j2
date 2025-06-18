@@ -5,6 +5,9 @@
 
 FROM {{ args.dockerfile.base.from }}
 
+# upgrade apt
+RUN apt-get update && apt-get upgrade -y
+
 # Set the working directory
 WORKDIR /workspace/src
 
