@@ -126,6 +126,55 @@ if [ "$VERBOSE_MODE" = true ]; then
  set -x
 fi
 
+# Function to check if the app version is greater than or equal to the specified version
+# Arguments:
+#   $1: The app version to check
+#   $2: The version to compare against
+# Returns:
+#   1 if the app version is greater than or equal to the specified version, 0 otherwise
+# Usage:
+#   check_version "1.2.3" "1.2.4"
+function check_version_greater_equal {
+    APPVER=$1
+    VERSION=$2
+
+    rv=0
+
+    if { echo "$APPVER"; echo "$VERSION"; } | sort --reverse --version-sort --check=quiet; then
+        echo "App version is $VERSION or greater"
+        rv=1
+    else
+        echo "App version is less than $VERSION"
+        rv=0
+    fi
+    return $rv
+}
+
+# Function to check if the pip version is greater than or equal to the specified version where
+# the --break-system-packages option was introduced.
+# Arguments:
+#   None
+# Returns:
+#   0 if the pip version is less than the required version, 1 otherwise
+# Usage:
+#   check_pip_version_use_break_system_packages
+function check_pip_version_use_break_system_packages {
+    # Get the pip version
+    pip_version=$(pip3 --version | awk '{print $2}')
+
+    # last version without --break-system-packages option
+    # https://pip.pypa.io/en/stable/news/#v23-0-1
+    required_version="23.0.1"
+    check_version_greater_equal "$pip_version" "$required_version"
+    if [ $? -eq 1 ]; then
+        echo "Pip version is $pip_version, which is greater than or equal to $required_version"
+        return 1
+    else
+        echo "Pip version is $pip_version, which is less than $required_version"
+        return 0
+    fi
+}
+
 function install_apt_deps {
     rv=0
     apt update
@@ -148,7 +197,14 @@ function install_pip_deps {
     fi
 
     # Install packages
-    pip3 install -r "$requirements_file"
+
+    check_pip_version_use_break_system_packages
+    if [ $? -eq 1 ]; then
+        pip3 install --break-system-packages -r "$requirements_file"
+    else
+        pip3 install -r "$requirements_file"
+    fi
+    
     if [ $? -ne 0 ]; then
         echo "ERROR: Failed to install pip dependencies from $requirements_file"
         rv=1
@@ -198,7 +254,14 @@ function install_module_resources {
                             echo "Checking file: $filename"
                             if [ "$module" == "$filename" ]; then
                                 echo "Installing from $file"
-                                pip3 install -r "$file"
+                                # Check if pip version supports --break-system-packages
+                                check_pip_version_use_break_system_packages
+                                if [ $? -eq 1 ]; then
+                                    # If pip version is less than required, use --break-system-packages
+                                    pip3 install --break-system-packages -r "$file"
+                                else
+                                    pip3 install -r "$file"
+                                fi
                                 if [ $? -ne 0 ]; then
                                     rv=$rv+1
                                 fi

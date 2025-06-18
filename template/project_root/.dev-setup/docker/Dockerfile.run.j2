@@ -48,4 +48,4 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN rm -rf /workspace/src /workspace/build /workspace/log
 
 # Run the main launch file
-CMD {{ args.dockerfile.run.cmd }}
+CMD {{ args.dockerfile.run.cmd | replace("'", '"') }}
