@@ -327,19 +327,46 @@ function clone_repos {
     return $rv
 }
 
+# function update_git_submodules {
+#     rv=0
+#     # Check if src directory exists
+#     if [ ! -d "$PATH_VCS_WORKING_DIRECTORY" ]; then
+#         echo "Directory $PATH_VCS_WORKING_DIRECTORY does not exist. This script should be run from the root of the workspace."
+#         rv=1
+#     else
+#         find "$PATH_VCS_WORKING_DIRECTORY" -type d | while read -r dir; do
+#             if [ -f "$dir/GET_SUBMODULE" ]; then
+#                 echo "Updating git submodules in $dir"
+#                 git -C "$dir" submodule update --init --recursive
+#                 if [ $? -ne 0 ]; then
+#                     rv=1
+#                 fi
+#             fi
+#         done
+#     fi
+#     rv=$?
+#     return $rv
+# }
+
 function install_conan_packages {
     rv=0
     path=$1
     if [ -d "$path" ]; then
-        # Find conanfiles in the specified path
         find "$path" -type f \( -name "conanfile.txt" -o -name "conanfile.py" \) | while read -r conanfile; do
-            # check if a install.sh file exists in the same directory
-            install_script="$(dirname "$conanfile")/install.sh"
-            if [ -f "$install_script" ]; then
-                echo "Running install script: $install_script"
-                bash "$install_script"
-                if [ $? -ne 0 ]; then
-                    rv=$((rv + 1))
+            pip3 install conan
+            conan profile detect --force
+            dir="$(dirname "$conanfile")"
+            if [[ "$conanfile" == *.txt ]]; then
+                echo "Installing dependencies from $conanfile"
+                conan install "$dir" --build missing --output-folder install/conan
+            elif [[ "$conanfile" == *.py ]]; then
+                # Check if it's a package recipe (contains 'class' and 'ConanFile')
+                if grep -q "class .*ConanFile" "$conanfile"; then
+                    echo "Building package from $conanfile"
+                    conan create "$dir" --build=missing
+                else
+                    echo "Installing dependencies from $conanfile"
+                    conan install "$dir" --build=missing --output-folder install/conan
                 fi
             fi
         done
@@ -355,6 +382,7 @@ commands=(
     "install_apt_deps"
     "install_pip_deps"
     "clone_repos"
+    # "update_git_submodules"
     "install_module_resources \"$PATH_PIP_SEARCH_FOLDER\""
     "install_conan_packages \"$PATH_CONAN_SEARCH_FOLDER\""
     "install_ros_deps"
