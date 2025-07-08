@@ -387,6 +387,8 @@ commands=(
     "install_conan_packages \"$PATH_CONAN_SEARCH_FOLDER\""
     "install_ros_deps"
 )
+# Initialize an empty list to accept strings
+error_commands=()
 
 # Loop over each command and execute it
 for cmd in "${commands[@]}"; do
@@ -394,10 +396,12 @@ for cmd in "${commands[@]}"; do
     eval "$cmd"
     if [ $? -ne 0 ]; then
         error_counter=$(( error_counter + 1 ))
+        error_commands+=("$cmd")
         echo "ERROR: $cmd"
     fi
 done
 
 echo "error counter $error_counter"
+echo "Commands with errors: ${error_commands[@]}"
 
 exit $error_counter
