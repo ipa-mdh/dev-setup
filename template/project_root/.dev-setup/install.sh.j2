@@ -332,8 +332,12 @@ commands=(
     "install_pip_deps"
     "clone_repos"
     "install_module_resources \"$PATH_PIP_SEARCH_FOLDER\""
-    "install_ros_deps"
 )
+
+{%- if "ros" in args.environment %}
+# Add the command to install ROS dependencies
+commands+=("install_ros_deps")
+{%- endif %}
 
 # Loop over each command and execute it
 for cmd in "${commands[@]}"; do
