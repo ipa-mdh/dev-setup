@@ -209,6 +209,7 @@ function install_pip_deps {
         rv=1
     else
         echo "All pip dependencies installed successfully"
+        rv=0
     fi
 
     return $rv
