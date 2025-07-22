@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Default variable values
 VERBOSE_MODE=false
 KEEP_GIT_CREDENTIALS_FILE=false
+PATH_CONAN_SEARCH_FOLDER="./src"
 PATH_PIP_SEARCH_FOLDER="./src"
 PATH_VCS_WORKING_DIRECTORY="./src"
 # PIP_VENV_PATH="venv"
@@ -318,7 +319,7 @@ function clone_repos {
             echo "Running 'vcs import in: $PATH_VCS_WORKING_DIRECTORY"
             
             # Change to the directory containing the .rosinstall file
-            vcs import . < "$rosinstall_dir/.rosinstall"
+            vcs import . < "$rosinstall_dir/.rosinstall" --recursive
         done
         cd -
     fi
@@ -326,14 +327,68 @@ function clone_repos {
     return $rv
 }
 
+# function update_git_submodules {
+#     rv=0
+#     # Check if src directory exists
+#     if [ ! -d "$PATH_VCS_WORKING_DIRECTORY" ]; then
+#         echo "Directory $PATH_VCS_WORKING_DIRECTORY does not exist. This script should be run from the root of the workspace."
+#         rv=1
+#     else
+#         find "$PATH_VCS_WORKING_DIRECTORY" -type d | while read -r dir; do
+#             if [ -f "$dir/GET_SUBMODULE" ]; then
+#                 echo "Updating git submodules in $dir"
+#                 git -C "$dir" submodule update --init --recursive
+#                 if [ $? -ne 0 ]; then
+#                     rv=1
+#                 fi
+#             fi
+#         done
+#     fi
+#     rv=$?
+#     return $rv
+# }
+
+function install_conan_packages {
+    rv=0
+    path=$1
+    if [ -d "$path" ]; then
+        find "$path" -type f \( -name "conanfile.txt" -o -name "conanfile.py" \) | while read -r conanfile; do
+            pip3 install conan
+            conan profile detect --force
+            dir="$(dirname "$conanfile")"
+            if [[ "$conanfile" == *.txt ]]; then
+                echo "Installing dependencies from $conanfile"
+                conan install "$dir" --build missing --output-folder install/conan
+            elif [[ "$conanfile" == *.py ]]; then
+                # Check if it's a package recipe (contains 'class' and 'ConanFile')
+                if grep -q "class .*ConanFile" "$conanfile"; then
+                    echo "Building package from $conanfile"
+                    conan create "$dir" --build=missing
+                else
+                    echo "Installing dependencies from $conanfile"
+                    conan install "$dir" --build=missing --output-folder install/conan
+                fi
+            fi
+        done
+    else
+        echo "No directory found at $path"
+        ls -l
+        rv=1
+    fi
+}
+
 error_counter=0
 commands=(
     "install_apt_deps"
     "install_pip_deps"
     "clone_repos"
+    # "update_git_submodules"
     "install_module_resources \"$PATH_PIP_SEARCH_FOLDER\""
+    "install_conan_packages \"$PATH_CONAN_SEARCH_FOLDER\""
     "install_ros_deps"
 )
+# Initialize an empty list to accept strings
+error_commands=()
 
 # Loop over each command and execute it
 for cmd in "${commands[@]}"; do
@@ -341,10 +396,12 @@ for cmd in "${commands[@]}"; do
     eval "$cmd"
     if [ $? -ne 0 ]; then
         error_counter=$(( error_counter + 1 ))
+        error_commands+=("$cmd")
         echo "ERROR: $cmd"
     fi
 done
 
 echo "error counter $error_counter"
+echo "Commands with errors: ${error_commands[@]}"
 
 exit $error_counter
