@@ -33,8 +33,8 @@ stages:
 install_dependencies:
   <<: *install_definition
   script:
-    - bash "$PACKAGE_PATH"/dev-setup/setup_git_credentials.sh --use-ci-job-token
-    - bash "$PACKAGE_PATH"/dev-setup/install.sh
+    - bash "$PACKAGE_PATH"/.dev-setup/setup_git_credentials.sh --use-ci-job-token
+    - bash "$PACKAGE_PATH"/.dev-setup/install.sh
     - ls -la "$WORKSPACE_PATH"/src
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: DEPENDENCIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
