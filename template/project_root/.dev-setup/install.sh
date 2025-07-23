@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERBOSE_MODE=false
 KEEP_GIT_CREDENTIALS_FILE=false
 PATH_CONAN_SEARCH_FOLDER="./src"
+PATH_CONAN_OUTPUT_FOLDER="/opt/dev-setup/conan"
 PATH_PIP_SEARCH_FOLDER="./src"
 PATH_VCS_WORKING_DIRECTORY="./src"
 # PIP_VENV_PATH="venv"
@@ -357,7 +358,7 @@ function install_conan_packages {
             dir="$(dirname "$conanfile")"
             if [[ "$conanfile" == *.txt ]]; then
                 echo "Installing dependencies from $conanfile"
-                conan install "$dir" --build missing --output-folder conan
+                conan install "$dir" --build missing --output-folder "$PATH_CONAN_OUTPUT_FOLDER"
                 if [ $? -ne 0 ]; then
                     echo "ERROR: Failed to install conan dependencies from $conanfile"
                     rv=1
@@ -374,7 +375,7 @@ function install_conan_packages {
                 fi
                 
                 echo "Installing dependencies from $conanfile"
-                conan install "$dir" --build=missing --output-folder conan
+                conan install "$dir" --build=missing --output-folder "$PATH_CONAN_OUTPUT_FOLDER"
                 if [ $? -ne 0 ]; then
                     echo "ERROR: Failed to install conan dependencies from $conanfile"
                     rv=1

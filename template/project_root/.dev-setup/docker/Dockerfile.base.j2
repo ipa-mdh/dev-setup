@@ -37,7 +37,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 SHELL ["/bin/bash", "-c"]
 
 # Set entry point for ROS
-COPY .dev-setup/docker/entrypoint.sh /opt/robot-mindset/
-RUN chmod +x /opt/robot-mindset/entrypoint.sh
-ENTRYPOINT ["/opt/robot-mindset/entrypoint.sh"]
+COPY .dev-setup/docker/entrypoint.sh /opt/dev-setup/
+COPY .dev-setup/docker/setup.bash /opt/dev-setup/
+RUN chmod +x /opt/dev-setup/entrypoint.sh
+ENTRYPOINT ["/opt/dev-setup/entrypoint.sh"]
 CMD {{ args.dockerfile.base.cmd | replace("'", '"') }}

@@ -2,11 +2,12 @@
 
 docker login {{ args.docker.registry.url }}
 
-# --- Push images ---
+# --- Pull and tag images ---
 
 {%- for key, cfg in args.dockerfile.items() %}
     {%- if cfg.registry is defined %}
 # {{ cfg.tag }}
-docker push {{ cfg.registry.tag }}
+docker pull {{ cfg.registry.tag }}
+docker tag {{ cfg.registry.tag }} {{ cfg.tag }}
     {%- endif %}
 {%- endfor %}

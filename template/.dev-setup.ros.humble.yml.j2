@@ -31,7 +31,7 @@ dockerfile:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
             tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
-        build_cmd: "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
+        build_cmd: "source /opt/dev-setup/entrypoint.sh && colcon build"
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
@@ -42,7 +42,7 @@ dockerfile:
 
 entrypoint:
     source: ["/opt/ros/humble/setup.bash",
-             "/workspace/conan/conanrosenv.sh",
+             "/opt/dev-setup/conan/conanrosenv.sh",
              "/workspace/install/setup.bash"]
 
 devcontainer:

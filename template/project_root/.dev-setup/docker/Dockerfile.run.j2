@@ -28,24 +28,24 @@ RUN rm -rf ~/.git-credentials
 # Build the workspace
 RUN {{ args.dockerfile.run.build_cmd }}
 
-# Clean up apt cache and reduce image size
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 # -----------------------------------------------------------------------------
 # TODO: use multi-stage builds
 #        - copy workspace install folder
-#        - copy /opt/robot-mindset/venv
+#        - copy /opt/dev-setup/venv
 #        - rosdep install + plain cmake / conan?
 #
 # FROM {{ args.dockerfile.base.from }}
 # COPY --from=build /workspace/install /workspace/install
-# COPY --from=build /opt/robot-mindset /opt/robot-mindset
+# COPY --from=build /opt/dev-setup /opt/dev-setup
 # COPY --from=build /opt/ros /opt/ros
 # RUN rosdep install --from-paths /workspace/install --ignore-src -r -y
-# -----------------------------------------------------------------------------
 
-# Delete the workspace folder after installation, except for the install folder, to clean up
-RUN rm -rf /workspace/src /workspace/build /workspace/log
+FROM {{ args.dockerfile.run.from }}
+COPY --from=build /opt/ros /opt/ros
+COPY --from=build /opt/dev-setup /opt/dev-setup
+COPY --from=build /workspace/install /workspace/install
+COPY --from=build /root/.conan2 /root/.conan2
+# -----------------------------------------------------------------------------
 
 # Run the main launch file
 CMD {{ args.dockerfile.run.cmd | replace("'", '"') }}

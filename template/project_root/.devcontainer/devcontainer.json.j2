@@ -50,12 +50,12 @@
 			"settings": {
 				"editor.formatOnSave": true,
 				"terminal.integrated.profiles.linux": {
-					"bash-robot-mindset": {
+					"bash-dev-setup": {
 						"path": "/bin/bash",
-						"args": ["--rcfile", "/opt/robot-mindset/entrypoint.sh"]
+						"args": ["--rcfile", "/opt/dev-setup/setup.bash"]
 						}
 				},
-				"terminal.integrated.defaultProfile.linux": "bash-robot-mindset"
+				"terminal.integrated.defaultProfile.linux": "bash-dev-setup"
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": {{ args.devcontainer.vscode.extensions | tojson }}
