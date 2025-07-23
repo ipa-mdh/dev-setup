@@ -358,15 +358,27 @@ function install_conan_packages {
             if [[ "$conanfile" == *.txt ]]; then
                 echo "Installing dependencies from $conanfile"
                 conan install "$dir" --build missing --output-folder conan
+                if [ $? -ne 0 ]; then
+                    echo "ERROR: Failed to install conan dependencies from $conanfile"
+                    rv=1
+                fi
             elif [[ "$conanfile" == *.py ]]; then
                 # Check if it's a package recipe (contains 'class' and 'ConanFile')
                 if grep -q "class .*ConanFile" "$conanfile"; then
                     echo "Building package from $conanfile"
                     conan create "$dir" --build=missing
+                    if [ $? -ne 0 ]; then
+                        echo "ERROR: Failed to create conan package from $conanfile"
+                        rv=1
+                    fi
                 fi
                 
                 echo "Installing dependencies from $conanfile"
                 conan install "$dir" --build=missing --output-folder conan
+                if [ $? -ne 0 ]; then
+                    echo "ERROR: Failed to install conan dependencies from $conanfile"
+                    rv=1
+                fi
             fi
         done
     else
@@ -374,6 +386,8 @@ function install_conan_packages {
         ls -l
         rv=1
     fi
+
+    return $rv
 }
 
 error_counter=0
