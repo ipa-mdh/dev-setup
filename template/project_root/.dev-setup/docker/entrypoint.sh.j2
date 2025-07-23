@@ -6,15 +6,21 @@
 
 # set -e
 
-{% if args.entrypoint is defined %}
-{% if args.entrypoint.source is defined %}
-{% for source in args.entrypoint.source %}
+{%- if args.entrypoint is defined %}
+{%- if args.entrypoint.source is defined %}
+{%- for source in args.entrypoint.source %}
+
+# {{ source }}
 if [ -f "{{ source }}" ]; then
+    echo -e "\033[0;32m > Source {{ source }}\033[0m"
     source "{{ source }}"
+else
+    echo -e "\033[0;31m > {{ source }} not found\033[0m"
+    echo -e "\033[0;31m   Please ensure the file exists and is accessible\033[0m"
 fi
-{% endfor %}
-{% endif %}
-{% endif %}
+{%- endfor %}
+{%- endif %}
+{%- endif %}
 
 # Execute the passed command
 exec "$@"

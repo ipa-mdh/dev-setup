@@ -21,9 +21,9 @@
 			"{{ key }}": "{{ value }}"
 			{%- if not loop.last %},{%- endif %}
 			{%- endfor %}	
-		{%- endif %}
-		{%- endif %}
 		}
+		{%- endif %}
+		{%- endif %}
 	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
@@ -52,7 +52,7 @@
 				"terminal.integrated.profiles.linux": {
 					"bash-robot-mindset": {
 						"path": "/bin/bash",
-						"args": ["/opt/robot-mindset/entrypoint.sh", "bash"]
+						"args": ["--rcfile", "/opt/robot-mindset/entrypoint.sh"]
 						}
 				},
 				"terminal.integrated.defaultProfile.linux": "bash-robot-mindset"
