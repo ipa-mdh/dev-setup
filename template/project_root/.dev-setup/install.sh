@@ -363,33 +363,10 @@ function install_conan_packages {
                 if grep -q "class .*ConanFile" "$conanfile"; then
                     echo "Building package from $conanfile"
                     conan create "$dir" --build=missing
-                else
-                    echo "Installing dependencies from $conanfile"
-                    conan install "$dir" --build=missing --output-folder conan
                 fi
-            fi
-        done
-    else
-        echo "No directory found at $path"
-        ls -l
-        rv=1
-    fi
-}
-
-function install_conan_packages {
-    rv=0
-    path=$1
-    if [ -d "$path" ]; then
-        # Find conanfiles in the specified path
-        find "$path" -type f \( -name "conanfile.txt" -o -name "conanfile.py" \) | while read -r conanfile; do
-            # check if a install.sh file exists in the same directory
-            install_script="$(dirname "$conanfile")/install.sh"
-            if [ -f "$install_script" ]; then
-                echo "Running install script: $install_script"
-                bash "$install_script"
-                if [ $? -ne 0 ]; then
-                    rv=$((rv + 1))
-                fi
+                
+                echo "Installing dependencies from $conanfile"
+                conan install "$dir" --build=missing --output-folder conan
             fi
         done
     else
