@@ -66,9 +66,12 @@ pages:
   - rm -rf doxygen/documentation
   - doxygen doxygen/Doxyfile
   - mv doxygen/documentation/html doxygen/documentation/public
+  publish: doxygen/documentation/public
   artifacts:
     paths:
     - doxygen/documentation/public
+  only:
+    - main  # Or 'master', or your default branch
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: DOCS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
