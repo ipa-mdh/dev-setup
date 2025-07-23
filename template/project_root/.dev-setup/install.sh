@@ -319,7 +319,7 @@ function clone_repos {
             echo "Running 'vcs import in: $PATH_VCS_WORKING_DIRECTORY"
             
             # Change to the directory containing the .rosinstall file
-            vcs import . < "$rosinstall_dir/.rosinstall" --recursive
+            vcs import . < "$rosinstall_dir/.rosinstall" --recursive  --shallow
         done
         cd -
     fi
@@ -353,12 +353,11 @@ function install_conan_packages {
     path=$1
     if [ -d "$path" ]; then
         find "$path" -type f \( -name "conanfile.txt" -o -name "conanfile.py" \) | while read -r conanfile; do
-            pip3 install conan
             conan profile detect --force
             dir="$(dirname "$conanfile")"
             if [[ "$conanfile" == *.txt ]]; then
                 echo "Installing dependencies from $conanfile"
-                conan install "$dir" --build missing --output-folder install/conan
+                conan install "$dir" --build missing --output-folder conan
             elif [[ "$conanfile" == *.py ]]; then
                 # Check if it's a package recipe (contains 'class' and 'ConanFile')
                 if grep -q "class .*ConanFile" "$conanfile"; then
@@ -366,7 +365,7 @@ function install_conan_packages {
                     conan create "$dir" --build=missing
                 else
                     echo "Installing dependencies from $conanfile"
-                    conan install "$dir" --build=missing --output-folder install/conan
+                    conan install "$dir" --build=missing --output-folder conan
                 fi
             fi
         done
