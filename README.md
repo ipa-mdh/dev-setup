@@ -95,6 +95,21 @@ module/                          # Your main repository root
   
 - The `setup.py` script ensures that a default `.dev-setup.yml` is created if one is not present, so you always start with a base configuration which you can then modify to suit your project's needs.
 
+## Notes
+
+### Cloning Repositories
+
+- The install script clones repositories **recursively**, ensuring all submodules are included.
+- A **shallow clone** downloads only the most recent commits, helping reduce disk space and speed up the cloning process.
+
+If you need the complete commit history later, you can "unshallow" the repository:
+
+```bash
+git fetch --unshallow
+```
+
+This command fetches the full history from the remote repository, converting your shallow clone into a complete one.
+
 ---
 
 With **dev-setup** integrated as a submodule in your **main repository**, you can efficiently manage development dependencies, container setups, and CI/CD integration—all while maintaining a clean separation between source code and container configuration.
