@@ -16,6 +16,10 @@ COPY . /workspace/src/{{ args.package_name }}
 # Set the working directory back to workspace
 WORKDIR /workspace
 
+RUN apt update
+RUN apt install doxygen -y
+RUN apt install graphviz -y
+
 # Make sure the install script is executable
 RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/install.sh
 
