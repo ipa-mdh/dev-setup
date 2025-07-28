@@ -352,9 +352,9 @@ function clone_repos {
 function install_conan_packages {
     rv=0
     path=$1
+    conan profile detect --force
     if [ -d "$path" ]; then
         find "$path" -type f \( -name "conanfile.txt" -o -name "conanfile.py" \) | while read -r conanfile; do
-            conan profile detect --force
             dir="$(dirname "$conanfile")"
             if [[ "$conanfile" == *.txt ]]; then
                 echo "Installing dependencies from $conanfile"
