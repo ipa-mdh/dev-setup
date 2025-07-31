@@ -415,7 +415,12 @@ for cmd in "${commands[@]}"; do
     fi
 done
 
-echo "error counter $error_counter"
-echo "Commands with errors: ${error_commands[@]}"
+if [ $error_counter -eq 0 ]; then
+    echo -e "\033[0;32mAll commands executed successfully.\033[0m"
+else
+    echo -e "\033[0;31mERROR: $error_counter command(s) failed.\033[0m"
+    echo -e "\033[0;31mFailed commands: ${error_commands[*]}\033[0m"
+fi
 
 exit $error_counter
+
