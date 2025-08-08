@@ -9,10 +9,11 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 from jinja2 import Environment, FileSystemLoader, Template
 import shutil
+import copy
 
 target_dir = Path(".dev-setup")
 template_dir = Path("dev-setup/template")
-templete_project_root_dir = template_dir / "project_root"
+template_project_root_dir = template_dir / "project_root"
 
 dev_setup_config_file = Path(".dev-setup.yml")
 dev_setup_computed_config_file = target_dir / ".dev-setup.computed.yml"
@@ -191,7 +192,7 @@ def update_nested_dict_with_dict(original_dict: dict, updates: dict) -> dict:
 
 def merge_user_and_computed_config(user_config: dict, computed_config: dict) -> dict:
     """Merge user configuration with computed configuration."""
-    merged_config = user_config.copy()
+    merged_config = copy.deepcopy(user_config)
     return update_nested_dict_with_dict(merged_config, computed_config)
 
 def get_user_config_template_filename():
@@ -294,42 +295,6 @@ def main():
         create_user_config=True
         
     if create_user_config:
-        if package_name != "new_package" and existing_config.get('package_name') != package_name:
-            logger.warning(f"Package name conflict: config={existing_config.get('package_name')}, argument={package_name}")
-            context['package_name'] = ask_for_update('package_name',
-                                                    existing_config.get('package_name'),
-                                                    package_name,
-                                                    args.yes)
-        else:
-            context['package_name'] = existing_config.get('package_name', package_name)
-        
-        if args.environment != '' and existing_config.get('environment') != env:
-            logger.warning(f"Environment conflict: config={existing_config.get('environment')}, argument={env}")
-            context['environment'] = ask_for_update('environment',
-                                                    existing_config.get('environment'),
-                                                    env,
-                                                    args.yes)
-        else:
-            context['environment'] = existing_config.get('environment', env)
-        
-        # Check desktop_lite setting
-        existing_desktop_lite = existing_config.get('devcontainer', {}).get('feature', {}).get('desktop_lite', False)
-        if existing_desktop_lite != args.desktop_lite:
-            logger.warning(f"Desktop lite conflict: config={existing_desktop_lite}, argument={args.desktop_lite}")
-            context['devcontainer']['feature']['desktop_lite'] = ask_for_update('desktop_lite',
-                                                                                existing_desktop_lite,
-                                                                                args.desktop_lite,
-                                                                                args.yes)
-        else:
-            context['devcontainer']['feature']['desktop_lite'] = existing_desktop_lite
-        
-        # # Preserve other existing settings
-        # context['version'] = existing_config.get('version', '1.0')
-        # if 'docker' in existing_config:
-        #     logger.warning(existing_config['docker'])
-        #     context['docker'].update(existing_config['docker'])
-        #     logger.warning(context['docker'])
-
         # Generate user configuration file (.dev-setup.yml)
         logger.info(f"Generating user configuration: {dev_setup_config_file}")
         render_template(user_template_file, context, dev_setup_config_file)
@@ -355,10 +320,12 @@ def main():
     
     # Merge configurations for template rendering
     merged_config = merge_user_and_computed_config(user_config, computed_config)
-    logger.debug(f"Merged configuration: {merged_config}")
+    
+    logger.warning("overwrite merged/computed config with user config")
+    merged_config = merge_user_and_computed_config(merged_config, user_config)
     
     # Render template folder with merged configuration
-    render_template_folder(templete_project_root_dir, merged_config, target_dir.parent)
+    render_template_folder(template_project_root_dir, merged_config, target_dir.parent)
 
 if __name__ == "__main__":
     main()
