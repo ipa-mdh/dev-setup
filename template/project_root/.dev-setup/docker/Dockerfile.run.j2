@@ -41,10 +41,12 @@ RUN {{ args.dockerfile.run.build_cmd }}
 # RUN rosdep install --from-paths /workspace/install --ignore-src -r -y
 
 FROM {{ args.dockerfile.run.from }}
+{%- if args.environment.startswith('ros.') %}
 COPY --from=build /opt/ros /opt/ros
-COPY --from=build /opt/dev-setup /opt/dev-setup
 COPY --from=build /workspace/install /workspace/install
+{%- endif %}
 COPY --from=build /root/.conan2 /root/.conan2
+COPY --from=build /opt/dev-setup /opt/dev-setup
 # -----------------------------------------------------------------------------
 
 # Run the main launch file

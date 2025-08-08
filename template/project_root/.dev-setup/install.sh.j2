@@ -211,6 +211,7 @@ function install_pip_deps {
         rv=1
     else
         echo "All pip dependencies installed successfully"
+        rv=0
     fi
 
     return $rv
@@ -399,7 +400,9 @@ commands=(
     # "update_git_submodules"
     "install_module_resources \"$PATH_PIP_SEARCH_FOLDER\""
     "install_conan_packages \"$PATH_CONAN_SEARCH_FOLDER\""
+{%- if args.environment.startswith('ros.') %}
     "install_ros_deps"
+{%- endif %}
 )
 # Initialize an empty list to accept strings
 error_commands=()
