@@ -1,5 +1,6 @@
 # Computed configuration - Variables derived from user settings
 # This file contains variables that depend on user configuration or environment
+# In combination with the .dev-setup.yml file, it will serve as the context for the template files.
 
 {% set env_prefix = 'ros:humble' if args.environment == 'ros.humble' else 'ros:noetic' if args.environment == 'ros.noetic' else 'debian:12' -%}
 
@@ -45,16 +46,3 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
 
-entrypoint:
-    {% if args.environment == 'ros.humble' -%}
-    source: 
-        - "/opt/ros/humble/setup.bash"
-        - "/opt/dev-setup/conan/conanrosenv.sh"
-        - "/workspace/install/setup.bash"
-    {% elif args.environment == 'ros.noetic' -%}
-    source:
-        - "/opt/ros/noetic/setup.bash"
-        - "/workspace/devel/setup.bash"
-    {% else -%}
-    source: []
-    {% endif %}

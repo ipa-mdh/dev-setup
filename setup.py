@@ -22,7 +22,7 @@ DEFAULT_ENVIRONEMNT = "ros.humble"
 
 def parse_arguments():
     # Create the argument parser
-    parser = argparse.ArgumentParser(description="Setup script with package and environment settings.")
+    parser = argparse.ArgumentParser(description="Setup script with package and environment settings.Script arguments can only be used if the .dev-setup.yaml file needs generating. Otherwise, the context for the template files will be the .dev-setup.yaml file.")
     
     # Add the arguments with default values
     parser.add_argument(
@@ -278,6 +278,7 @@ def main():
         }
     }
     
+    create_user_config = False
     # Load existing user configuration if it exists
     if dev_setup_config_file.exists():
         logger.info(f"Loading existing user configuration from {dev_setup_config_file}")
@@ -286,47 +287,63 @@ def main():
         
         # Update context with existing values and check for conflicts
         if existing_config:
-            if package_name != "new_package" and existing_config.get('package_name') != package_name:
-                logger.warning(f"Package name conflict: config={existing_config.get('package_name')}, argument={package_name}")
-                context['package_name'] = ask_for_update('package_name',
-                                                        existing_config.get('package_name'),
-                                                        package_name,
-                                                        args.yes)
-            else:
-                context['package_name'] = existing_config.get('package_name', package_name)
-            
-            if args.environment != '' and existing_config.get('environment') != env:
-                logger.warning(f"Environment conflict: config={existing_config.get('environment')}, argument={env}")
-                context['environment'] = ask_for_update('environment',
-                                                       existing_config.get('environment'),
-                                                       env,
-                                                       args.yes)
-            else:
-                context['environment'] = existing_config.get('environment', env)
-            
-            # Check desktop_lite setting
-            existing_desktop_lite = existing_config.get('devcontainer', {}).get('feature', {}).get('desktop_lite', False)
-            if existing_desktop_lite != args.desktop_lite:
-                logger.warning(f"Desktop lite conflict: config={existing_desktop_lite}, argument={args.desktop_lite}")
-                context['devcontainer']['feature']['desktop_lite'] = ask_for_update('desktop_lite',
-                                                                                   existing_desktop_lite,
-                                                                                   args.desktop_lite,
-                                                                                   args.yes)
-            else:
-                context['devcontainer']['feature']['desktop_lite'] = existing_desktop_lite
-            
-            # Preserve other existing settings
-            context['version'] = existing_config.get('version', '1.0')
-            if 'docker' in existing_config:
-                context['docker'].update(existing_config['docker'])
+            user_config=existing_config
+        else:
+            create_user_config=True
+    else:
+        create_user_config=True
+        
+    if create_user_config:
+        if package_name != "new_package" and existing_config.get('package_name') != package_name:
+            logger.warning(f"Package name conflict: config={existing_config.get('package_name')}, argument={package_name}")
+            context['package_name'] = ask_for_update('package_name',
+                                                    existing_config.get('package_name'),
+                                                    package_name,
+                                                    args.yes)
+        else:
+            context['package_name'] = existing_config.get('package_name', package_name)
+        
+        if args.environment != '' and existing_config.get('environment') != env:
+            logger.warning(f"Environment conflict: config={existing_config.get('environment')}, argument={env}")
+            context['environment'] = ask_for_update('environment',
+                                                    existing_config.get('environment'),
+                                                    env,
+                                                    args.yes)
+        else:
+            context['environment'] = existing_config.get('environment', env)
+        
+        # Check desktop_lite setting
+        existing_desktop_lite = existing_config.get('devcontainer', {}).get('feature', {}).get('desktop_lite', False)
+        if existing_desktop_lite != args.desktop_lite:
+            logger.warning(f"Desktop lite conflict: config={existing_desktop_lite}, argument={args.desktop_lite}")
+            context['devcontainer']['feature']['desktop_lite'] = ask_for_update('desktop_lite',
+                                                                                existing_desktop_lite,
+                                                                                args.desktop_lite,
+                                                                                args.yes)
+        else:
+            context['devcontainer']['feature']['desktop_lite'] = existing_desktop_lite
+        
+        # # Preserve other existing settings
+        # context['version'] = existing_config.get('version', '1.0')
+        # if 'docker' in existing_config:
+        #     logger.warning(existing_config['docker'])
+        #     context['docker'].update(existing_config['docker'])
+        #     logger.warning(context['docker'])
+
+        # Generate user configuration file (.dev-setup.yml)
+        logger.info(f"Generating user configuration: {dev_setup_config_file}")
+        render_template(user_template_file, context, dev_setup_config_file)
     
-    # Generate user configuration file (.dev-setup.yml)
-    logger.info(f"Generating user configuration: {dev_setup_config_file}")
-    render_template(user_template_file, context, dev_setup_config_file)
-    
-    # Reload the generated user configuration
-    with open(dev_setup_config_file) as f:
-        user_config = yaml.safe_load(f)
+        # Reload the generated user configuration
+        with open(dev_setup_config_file) as f:
+            user_config = yaml.safe_load(f)
+    else:
+        logger.warning("-----------------------------------------------")
+        logger.warning("  Script arguments can only be used")
+        logger.warning("  if the .dev-setup.yaml file needs generating.")
+        logger.warning("  Otherwise, the context for the template files")
+        logger.warning("  will be the .dev-setup.yaml file.")
+        logger.warning("-----------------------------------------------")
     
     # Generate computed configuration file (.dev-setup/config.yml)
     logger.info(f"Generating computed configuration: {dev_setup_computed_config_file}")

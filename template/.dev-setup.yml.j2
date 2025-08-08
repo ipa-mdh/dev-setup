@@ -1,5 +1,6 @@
 # User configuration - Independent variables only
 # This file contains only variables that are not computed from other variables
+# In combination with the .dev-setup/.dev-setup.computed.yml file, it will serve as the context for the template files.
 
 package_name: "{{ args.package_name }}"
 environment: "{{ args.environment }}"
@@ -29,3 +30,17 @@ devcontainer:
             - "samuelcolvin.jinjahtml"
             {% if args.environment.startswith('ros') -%}
             {% endif %}
+
+entrypoint:
+    {% if args.environment == 'ros.humble' -%}
+    source: 
+        - "/opt/ros/humble/setup.bash"
+        - "/opt/dev-setup/conan/conanrosenv.sh"
+        - "/workspace/install/setup.bash"
+    {% elif args.environment == 'ros.noetic' -%}
+    source:
+        - "/opt/ros/noetic/setup.bash"
+        - "/workspace/devel/setup.bash"
+    {% else -%}
+    source: []
+    {% endif %}
