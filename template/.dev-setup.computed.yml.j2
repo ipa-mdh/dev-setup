@@ -1,0 +1,60 @@
+# Computed configuration - Variables derived from user settings
+# This file contains variables that depend on user configuration or environment
+
+{% set env_prefix = 'ros:humble' if args.environment == 'ros.humble' else 'ros:noetic' if args.environment == 'ros.noetic' else 'debian:12' -%}
+
+dockerfile:
+    base:
+        from: "{{ env_prefix }}"
+        tag: "{{ args.package_name }}:base-{{ args.version }}"
+        cmd: ["bash"]
+        build: true
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:base-{{ args.version }}"
+    
+    devcontainer:
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
+        cmd: ["bash"]
+        build: false
+    
+    ci:
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:ci-{{ args.version }}"
+        cmd: ["bash"]
+        build: true
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
+        build_cmd: "source /opt/dev-setup/setup.bash && colcon build"
+    
+    run:
+        from: "{{ args.package_name }}:base-{{ args.version }}"
+        tag: "{{ args.package_name }}:run-{{ args.version }}"
+        {% if args.environment == 'ros.humble' -%}
+        cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
+        {% elif args.environment == 'ros.noetic' -%}
+        cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node.launch"]
+        {% else -%}
+        cmd: ["bash", "-c", "{{ args.package_name }}"]
+        {% endif %}
+        build: true
+        build_arguments:
+            secret: id=gitcreds,src=$HOME/.git-credentials
+
+entrypoint:
+    {% if args.environment == 'ros.humble' -%}
+    source: 
+        - "/opt/ros/humble/setup.bash"
+        - "/opt/dev-setup/conan/conanrosenv.sh"
+        - "/workspace/install/setup.bash"
+    {% elif args.environment == 'ros.noetic' -%}
+    source:
+        - "/opt/ros/noetic/setup.bash"
+        - "/workspace/devel/setup.bash"
+    {% else -%}
+    source: []
+    {% endif %}

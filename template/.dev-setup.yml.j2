@@ -1,45 +1,31 @@
-package_name: new_package
-environment: "debian
+# User configuration - Independent variables only
+# This file contains only variables that are not computed from other variables
 
+package_name: "{{ args.package_name }}"
+environment: "{{ args.environment }}"
+version: "{{ args.version | default('1.0') }}"
+
+# Docker registry configuration
 docker:
     registry:
         url: "container-registry.gitlab.cc-asp.fraunhofer.de"
-        path: "multirobot/{{ args.package_name }}"
+        path: "multirobot"
 
-dockerfile:
-    base:
-        from: "ros:humble"
-        tag: "{{ args.package_name }}_base:1.0"
-        cmd: ["bash"]
-        build: true
-        build_arguments:
-            secret: id=gitcreds,src=$HOME/.git-credentials
-    devcontainer:
-        from: "{{ args.package_name }}_base:1.0"
-        tag: "{{ args.package_name }}_devcontainer:1.0"
-        cmd: ["bash"]
-        build: false
-    run:
-        from: "{{ args.package_name }}_base:1.0"
-        tag: "{{ args.package_name }}_run:1.0"
-        cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
-        build: true
-        build_arguments:
-            secret: id=gitcreds,src=$HOME/.git-credentials
-
-entrypoint:
-    source: ["/opt/ros/humble/setup.bash",
-             "/workspace/install/setup.bash"]
-
+# Development container features
 devcontainer:
-    vscode:
-        extensions: ["ms-python.python",
-                    "ms-vscode.cpptools-extension-pack",
-                    "ms-vscode.cmake-tools",
-                    "redhat.vscode-xml",
-                    "mhutchie.git-graph",
-                    "ms-azuretools.vscode-docker",
-                    "mtsmfm.vscode-stl-viewer"]
     feature:
         packages: "ssh,curl,nano,python3-pip,git"
-        desktop_lite: "{{ args.devcontainer.feature.desktop_lite }}"
+        desktop_lite: {{ args.devcontainer.feature.desktop_lite | default(false) }}
+    vscode:
+        extensions: 
+            - "ms-python.python"
+            - "ms-vscode.cpptools-extension-pack"
+            - "ms-vscode.cmake-tools"
+            - "redhat.vscode-xml"
+            - "mhutchie.git-graph"
+            - "ms-azuretools.vscode-docker"
+            - "mtsmfm.vscode-stl-viewer"
+            - "cschlosser.doxdocgen"
+            - "samuelcolvin.jinjahtml"
+            {% if args.environment.startswith('ros') -%}
+            {% endif %}
