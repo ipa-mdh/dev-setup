@@ -64,5 +64,5 @@
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 	"workspaceFolder": "/workspace",
-	"postCreateCommand": "bash ./src/{{ args.package_name }}/.dev-setup/install.sh"
+	"postCreateCommand": "bash ./src/{{ args.package_name }}/.devcontainer/postCreateCommand.sh"
 }
