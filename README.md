@@ -23,7 +23,7 @@
 1. **Add as a Git Submodule**:  
    In your **main repository**, add **dev-setup** as a submodule. For example:
    ```bash
-   git submodule add git@github.com:ipa-mdh/dev-setup.git dev-setup
+   git submodule add https://github.com/ipa-mdh/dev-setup.git dev-setup
    ```
    This will clone the **dev-setup** repository into a folder named `dev-setup` in your **main repository**.
 
