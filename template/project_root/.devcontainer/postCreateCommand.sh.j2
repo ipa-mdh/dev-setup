@@ -20,6 +20,7 @@ else
 fi
 
 cd /workspace
+{%- if args.environment.startswith('ros.') %}
 colcon build --symlink-install
 if [ $? -ne 0 ]; then
     echo "Colcon build failed."
@@ -27,3 +28,4 @@ if [ $? -ne 0 ]; then
 else
     echo "Colcon build completed successfully."
 fi
+{%- endif %}
