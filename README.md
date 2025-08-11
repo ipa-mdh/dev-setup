@@ -36,21 +36,21 @@
    python dev-setup/setup.py
    ```
    This script will:
-   - Read the settings in your **main repository**'s `.dev-setup` (and optionally `.dev-setup.yml`) file.
-   - Create the necessary three Dockerfiles under `.dev-setup/docker/`.
+   - If it exists: Read the settings the **main repository**'s `.dev-setup.computed.yaml` and the `.dev-setup.yml` files.
+   - Create the necessary Dockerfiles under `.dev-setup/docker/`.
    - Generate a `.devcontainer` configuration folder with the appropriate settings to launch your development container.
    - Automatically generate a default `.dev-setup.yml` if one does not exist.
 
 ### Using the Generated Files
 
-After the setup is complete, follow these steps to build the Docker images and open your repository in a VS Code devcontainer:
+After the setup is complete, follow these steps to get / build the Docker images and open your repository in a VS Code devcontainer:
 
-1. **Build the Docker Images**:  
-   Use the provided build script to build all the necessary Docker images:
+1. **Get the Docker Images**:  
+   Use the provided build script to get or build all the necessary Docker images:
    ```bash
-   bash ./.dev-setup/docker/build-image.sh
+   bash ./.dev-setup/docker/get-image.sh
    ```
-   This script leverages the generated Dockerfiles (base, devcontainer, and run) to build your container images. Make sure Docker is installed and running on your machine.
+   This script uses the generated Dockerfiles (base, devcontainer and run) to build your container images. Alternatively, it will download the images from the registry if one is specified. Ensure that Docker is installed and running on your machine.
 
 2. **Open Your Repository with VS Code in a Devcontainer**:  
    Once the images are built, open your **main repository** folder in VS Code. VS Code will detect the `.devcontainer` folder and prompt you to reopen the folder in a container.  
@@ -109,7 +109,10 @@ module/                          # Your main repository root
 If you need the complete commit history later, you can "unshallow" the repository:
 
 ```bash
-git fetch --unshallow
+git fetch --unshallow --all
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git fetch origin
+
 ```
 
 This command fetches the full history from the remote repository, converting your shallow clone into a complete one.
