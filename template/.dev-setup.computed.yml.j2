@@ -36,13 +36,15 @@ dockerfile:
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
-        {% if args.environment == 'ros.humble' -%}
+{%- if args.environment == 'ros.humble' %}
         cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
-        {% elif args.environment == 'ros.noetic' -%}
+        build_cmd: source /opt/dev-setup/entrypoint.sh && colcon build
+{%- elif args.environment == 'ros.noetic' %}
         cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node.launch"]
-        {% else -%}
+        build_cmd: source /opt/dev-setup/entrypoint.sh && catkin make
+{%- else -%}
         cmd: ["bash", "-c", "{{ args.package_name }}"]
-        {% endif %}
+{%- endif %}
         build: true
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
