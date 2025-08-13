@@ -4,6 +4,9 @@ import argparse
 from loguru import logger
 
 def arguments():
+    """
+    Parse command-line arguments.
+    """
     parser = argparse.ArgumentParser(
         description="Scan a folder for Git repositories and unshallow selected ones."
     )
@@ -18,12 +21,21 @@ def arguments():
     return args
 
 def is_git_repo(path: Path) -> bool:
+    """
+    Check if a directory is a Git repository.
+    """
     return (path / ".git").is_dir()
 
 def is_shallow_clone(repo_path: Path) -> bool:
+    """
+    Check if a Git repository is a shallow clone.
+    """
     return (repo_path / ".git" / "shallow").is_file()
 
 def find_git_repos(root_dir: Path):
+    """
+    Find all Git repositories under the given root directory.
+    """
     repos = []
     # Use rglob to find .git dirs
     for path in root_dir.rglob(".git"):
@@ -32,6 +44,9 @@ def find_git_repos(root_dir: Path):
     return repos
 
 def unshallow_git_repo(cwd: Path):
+    """
+    Unshallow a Git repository.
+    """
     logger.info(f"Unshallowing repository: {cwd}")
     subprocess.run(["git", "fetch", "--unshallow"], cwd=cwd)
     subprocess.run(["git", "config", "remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*"], cwd=cwd)
