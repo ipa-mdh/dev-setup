@@ -59,7 +59,7 @@ def main():
     logger.info("Found repositories:")
     for idx, repo in enumerate(repos, start=1):
         mark = "[SHALLOW]" if is_shallow_clone(repo) else ""
-        logger.info(f"{idx}. {repo} {mark}")
+        logger.info(f"  {idx}. {repo} {mark}")
 
     shallows = [repo for repo in repos if is_shallow_clone(repo)]
     if not shallows:
@@ -68,7 +68,7 @@ def main():
 
     logger.info("Shallow repositories:")
     for idx, repo in enumerate(shallows, start=1):
-        logger.info(f"{idx}. {repo}")
+        logger.info(f"  {idx}. {repo}")
 
     choice = input("Enter the number to unshallow (blank to skip): ").strip()
     if choice:
