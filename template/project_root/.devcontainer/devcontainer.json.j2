@@ -36,9 +36,15 @@
 			"vncPort": "5901"
 		}{%- endif %}
 	},
+{%- if args.docker is defined %}
+	{%- if args.docker.runArgs is defined %}
+	"runArgs": {{ args.docker.runArgs | tojson }}
+	{%- endif %}
+{%- endif %}
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
-	 	{%- if args.devcontainer.feature.desktop_lite %}6080{%- endif %}
+	 	{% if args.devcontainer.feature.desktop_lite %}6080{%- endif %}
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	//"postCreateCommand": "pip install open3d",
@@ -58,7 +64,13 @@
 				"terminal.integrated.defaultProfile.linux": "bash-dev-setup"
 			},
 			// Add the IDs of extensions you want installed when the container is created.
+	{%- if args.devcontainer is defined%}
+		{%- if args.devcontainer.vscode is defined%}
+			{%- if args.devcontainer.vscode.extensions is defined%}
 			"extensions": {{ args.devcontainer.vscode.extensions | tojson }}
+			{%- endif %}
+		{%- endif %}
+	{%- endif %}
 		}
 	},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

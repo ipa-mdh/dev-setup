@@ -35,7 +35,7 @@ dockerfile:
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
-        cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
+        cmd: ["bash", "-c", "ros2 launch {{ args.package_name }} main.launch.py"]
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials

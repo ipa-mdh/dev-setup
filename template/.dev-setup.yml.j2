@@ -11,6 +11,13 @@ docker:
     registry:
         url: "container-registry.gitlab.cc-asp.fraunhofer.de"
         path: "multirobot"
+#   -- example for additional docker run arguments
+#    runArgs:
+#        - "--cap-add=sys_nice"
+#        - "--ulimit=rtprio=99"
+#        - "--ulimit=memlock=-1"
+#        - "--publish=15000:15000/udp"
+#        - "--publish=15000:15000"
 
 # Development container features
 devcontainer:
