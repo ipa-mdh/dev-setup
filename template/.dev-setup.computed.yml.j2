@@ -42,7 +42,7 @@ dockerfile:
 {%- elif args.environment == 'ros.noetic' %}
         cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node.launch"]
         build_cmd: source /opt/dev-setup/entrypoint.sh && catkin make
-{%- else -%}
+{%- else %}
         cmd: ["bash", "-c", "{{ args.package_name }}"]
 {%- endif %}
         build: true
