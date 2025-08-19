@@ -31,7 +31,7 @@ dockerfile:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
             tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
-        build_cmd: "source /opt/dev-setup/entrypoint.sh && colcon build"
+        build_cmd: "source /opt/dev-setup/setup.bash && colcon build"
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"

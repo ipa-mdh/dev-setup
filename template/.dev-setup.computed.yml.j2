@@ -38,10 +38,10 @@ dockerfile:
         tag: "{{ args.package_name }}:run-{{ args.version }}"
 {%- if args.environment == 'ros.humble' %}
         cmd: ["bash", "-c", "ros2 run {{ args.package_name }} node"]
-        build_cmd: source /opt/dev-setup/entrypoint.sh && colcon build
+        build_cmd: source /opt/dev-setup/setup.bash && colcon build
 {%- elif args.environment == 'ros.noetic' %}
         cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node.launch"]
-        build_cmd: source /opt/dev-setup/entrypoint.sh && catkin make
+        build_cmd: source /opt/dev-setup/setup.bash && catkin make
 {%- else %}
         cmd: ["bash", "-c", "{{ args.package_name }}"]
 {%- endif %}
