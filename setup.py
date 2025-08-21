@@ -199,9 +199,9 @@ def get_user_config_template_filename():
     """Get the filename for the user configuration template."""
     return ".dev-setup.yml.j2"
 
-def get_computed_config_template_filename():
+def get_computed_config_template_filename(environment: str = DEFAULT_ENVIRONEMNT):
     """Get the filename for the computed configuration template."""
-    return ".dev-setup.computed.yml.j2"
+    return f".dev-setup.{environment}.yml.j2"
 
 def get_dev_setup_user_config(file: Path, user_template_file: Path):
     """Load the user dev-setup configuration from a YAML file."""
@@ -254,8 +254,8 @@ def main():
     
     # Prepare user configuration
     user_template_file = template_dir / get_user_config_template_filename()
-    computed_template_file = template_dir / get_computed_config_template_filename()
-    
+    computed_template_file = template_dir / get_computed_config_template_filename(env)
+
     # Get package name from package.xml if available
     if package_file.exists() and package_name == "new_package":
         package_name = get_package_name(package_file)

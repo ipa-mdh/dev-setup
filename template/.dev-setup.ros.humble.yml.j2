@@ -22,6 +22,7 @@ dockerfile:
         tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
         cmd: ["bash"]
         build: False
+        build_cmd: source /opt/dev-setup/setup.bash && colcon build
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:ci-{{ args.version }}"
@@ -37,6 +38,7 @@ dockerfile:
         tag: "{{ args.package_name }}:run-{{ args.version }}"
         cmd: ["bash", "-c", "ros2 launch {{ args.package_name }} main.launch.py"]
         build: True
+        build_cmd: source /opt/dev-setup/setup.bash && colcon build
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
 

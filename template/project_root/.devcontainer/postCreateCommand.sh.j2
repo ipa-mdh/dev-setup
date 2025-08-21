@@ -20,12 +20,16 @@ else
 fi
 
 cd /workspace
-{%- if args.environment.startswith('ros.') %}
-colcon build --symlink-install
+{%- if args.dockerfile is defined %}
+{%- if args.dockerfile.devcontainer is defined %}
+{%- if args.dockerfile.devcontainer.build_cmd is defined %}
+{{ args.dockerfile.devcontainer.build_cmd }}
 if [ $? -ne 0 ]; then
-    echo "Colcon build failed."
+    echo "Build command ({{ args.dockerfile.devcontainer.build_cmd }}) failed."
     exit 3
 else
-    echo "Colcon build completed successfully."
+    echo "Build completed successfully."
 fi
+{%- endif %}
+{%- endif %}
 {%- endif %}

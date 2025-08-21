@@ -22,6 +22,7 @@ dockerfile:
         tag: "{{ args.package_name }}_devcontainer:{{ args.version }}"
         cmd: ["bash"]
         build: False
+        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --no-install && catkin build"
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:ci-{{ args.version }}"
