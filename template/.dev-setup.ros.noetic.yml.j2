@@ -22,7 +22,7 @@ dockerfile:
         tag: "{{ args.package_name }}_devcontainer:{{ args.version }}"
         cmd: ["bash"]
         build: False
-        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --no-install && catkin build"
+        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --no-install && catkin build"
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:ci-{{ args.version }}"
@@ -32,7 +32,7 @@ dockerfile:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
             tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:ci-{{ args.version }}"
-        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
+        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install && catkin build"
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
@@ -40,7 +40,7 @@ dockerfile:
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
-        build_cmd: "source /opt/ros/noetic/setup.bash && catkin init && catkin config --install && catkin build"
+        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install && catkin build"
 
 entrypoint:
     source: ["/opt/ros/noetic/setup.bash",
