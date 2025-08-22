@@ -39,20 +39,31 @@ install_dependencies:
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: DEPENDENCIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 # --------------------------------- BEGIN STAGE: BUILD ---------------------------------
+{%- if args.dockerfile %}
+{%- if args.dockerfile.ci %}
+{%- if args.dockerfile.ci.build_cmd %}
 
-# .build_template: &build_definition
-#   <<: *base_definition
-#   stage: build
-#   script:
-#     - bash "$PACKAGE_PATH"/dev-setup/install.sh #todo: remove this line
+.build_template: &build_definition
+  <<: *base_definition
+  stage: build
+  before_script:
+    - mkdir -p "$PACKAGE_PATH"
+    - cp -r . "$PACKAGE_PATH"
+    - cd "$WORKSPACE_PATH"
 
-# build:
-#   <<: *build_definition
-#   stage: build
-#   script:
-#     - {{ args.dockerfile.ci.build_cmd }}
+build:
+  <<: *build_definition
+  stage: build
+  script:
+    - bash "$PACKAGE_PATH"/.dev-setup/setup_git_credentials.sh --use-ci-job-token
+    - bash "$PACKAGE_PATH"/.dev-setup/install.sh
+    - {{ args.dockerfile.ci.build_cmd }}
 
+{%- endif %}
+{%- endif %}
+{%- endif %}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END STAGE: BUILD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # ---------------------------------- BEGIN STAGE: DOCS ----------------------------------
