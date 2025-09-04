@@ -74,7 +74,7 @@ def main():
     logger.info("Found repositories:")
     for idx, repo in enumerate(repos, start=1):
         mark = "[SHALLOW]" if is_shallow_clone(repo) else ""
-        logger.info(f"  {idx}. {repo} {mark}")
+        logger.info(f" - {repo} {mark}")
 
     shallows = [repo for repo in repos if is_shallow_clone(repo)]
     if not shallows:
