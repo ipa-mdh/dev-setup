@@ -273,12 +273,6 @@ function install_module_resources {
                                 if [ $? -ne 0 ]; then
                                     rv=$rv+1
                                 fi
-                            elif [ "$module.apt.d" == "$filename" ]; then
-                                echo "Install debian packages from $file"
-                                apt install $file/*.deb -y
-                                if [ $? -ne 0 ]; then
-                                    rv=$rv+1
-                                fi
                             fi
                         done
 
