@@ -3,9 +3,7 @@ environment: "{{ args.environment }}"
 version: "1.0"
 
 docker:
-    registry:
-        url: "container-registry.gitlab.cc-asp.fraunhofer.de"
-        path: "multirobot"
+    registry: "container-registry.gitlab.cc-asp.fraunhofer.de/multirobot"
 
 dockerfile:
     base:
@@ -16,7 +14,7 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:base-{{ args.version }}"
+            tag: "{{ args.docker.registry }}/{{ args.package_name }}:base-{{ args.version }}"
         order: 0
     devcontainer:
         from: "{{ args.package_name }}:base-{{ args.version }}"
@@ -32,9 +30,9 @@ dockerfile:
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
-        registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
         build_cmd: "source /opt/dev-setup/setup.bash && colcon build"
+        registry:
+            tag: "{{ args.docker.registry }}/{{ args.package_name }}:ci-{{ args.version }}"
         order: 1
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
@@ -45,6 +43,8 @@ dockerfile:
         build_cmd: source /opt/dev-setup/setup.bash && colcon build
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
+        registry:
+            tag: "{{ args.docker.registry }}/{{ args.package_name }}:run-{{ args.version }}"
         order: 2
 
 entrypoint:

@@ -3,9 +3,7 @@ environment: "{{ args.environment }}"
 version: "1.0"
 
 docker:
-    registry:
-        url: "container-registry.gitlab.cc-asp.fraunhofer.de"
-        path: "multirobot"
+    registry: "container-registry.gitlab.cc-asp.fraunhofer.de/multirobot"
 
 dockerfile:
     base:
@@ -16,7 +14,7 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:base-{{ args.version }}"
+            tag: "{{ args.docker.registry }}:base-{{ args.version }}"
         order: 0
     devcontainer:
         from: "{{ args.package_name }}:base-{{ args.version }}"
@@ -32,13 +30,15 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
+            tag: "{{ args.docker.registry }}:ci-{{ args.version }}"
         build_cmd: ""
         order: 1
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
         cmd: ["bash", "-c", "echo hi"]
+        registry:
+            tag: "{{ args.docker.registry }}:run-{{ args.version }}"
         build: True
         build_keep_folders: {{ args.dockerfile.run.build_keep_folders | default(["/root/.conan2", "/opt/dev-setup"]) }}
         build_arguments:

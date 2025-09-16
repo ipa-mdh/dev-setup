@@ -3,9 +3,7 @@ environment: "ros.noetic"
 version: "0.0.1"
 
 docker:
-    registry:
-        url: "container-registry.gitlab.cc-asp.fraunhofer.de"
-        path: "test_pkg"
+    registry: "container-registry.gitlab.cc-asp.fraunhofer.de/multirobot"
 
 dockerfile:
     base:
@@ -16,7 +14,7 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:base-{{ args.version }}"
+            tag: "{{ args.docker.registry }}/{{ args.package_name }}:base-{{ args.version }}"
     devcontainer:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}_devcontainer:{{ args.version }}"
@@ -31,7 +29,7 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
-            tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}:ci-{{ args.version }}"
+            tag: "{{ args.docker.registry }}/{{ args.package_name }}:ci-{{ args.version }}"
         build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install && catkin build"
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
@@ -42,6 +40,8 @@ dockerfile:
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install && catkin build"
+        registry:
+            tag: "{{ args.docker.registry }}:run-{{ args.version }}"
 
 entrypoint:
     source: ["/opt/ros/noetic/setup.bash",
