@@ -29,24 +29,15 @@ RUN rm -rf ~/.git-credentials
 RUN {{ args.dockerfile.run.build_cmd }}
 
 # -----------------------------------------------------------------------------
-# TODO: use multi-stage builds
-#        - copy workspace install folder
-#        - copy /opt/dev-setup/venv
-#        - rosdep install + plain cmake / conan?
-#
-# FROM {{ args.dockerfile.base.from }}
-# COPY --from=build /workspace/install /workspace/install
-# COPY --from=build /opt/dev-setup /opt/dev-setup
-# COPY --from=build /opt/ros /opt/ros
-# RUN rosdep install --from-paths /workspace/install --ignore-src -r -y
-
 FROM {{ args.dockerfile.run.from }}
-{%- if args.environment.startswith('ros.') %}
-COPY --from=build /opt/ros /opt/ros
-COPY --from=build /workspace/install /workspace/install
+
+{%- if args.dockerfile.run.build_keep_folders is defined %}
+{%- for folder in args.dockerfile.run.build_keep_folders %}
+COPY --from=build {{ folder }} {{ folder }}
+{%- endfor %}
+{%- else %}
+# No folders defined to keep from build stage
 {%- endif %}
-COPY --from=build /root/.conan2 /root/.conan2
-COPY --from=build /opt/dev-setup /opt/dev-setup
 # -----------------------------------------------------------------------------
 
 # Run the main launch file

@@ -17,12 +17,14 @@ dockerfile:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
             tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:base-{{ args.version }}"
+        order: 0
     devcontainer:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
         cmd: ["bash"]
         build: False
         build_cmd: source /opt/dev-setup/setup.bash && colcon build
+        order: 1
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:ci-{{ args.version }}"
@@ -33,14 +35,17 @@ dockerfile:
         registry:
             tag: "{{ args.docker.registry.url }}/{{ args.docker.registry.path }}/{{ args.package_name }}:ci-{{ args.version }}"
         build_cmd: "source /opt/dev-setup/setup.bash && colcon build"
+        order: 1
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
         cmd: ["bash", "-c", "ros2 launch {{ args.package_name }} main.launch.py"]
         build: True
+        build_keep_folders: {{ args.dockerfile.run.build_keep_folders | default(["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/install"]) }}
         build_cmd: source /opt/dev-setup/setup.bash && colcon build
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
+        order: 2
 
 entrypoint:
     source: ["/opt/ros/humble/setup.bash",

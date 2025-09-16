@@ -38,13 +38,14 @@ dockerfile:
         tag: "{{ args.package_name }}:run-{{ args.version }}"
         cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node"]
         build: True
+        build_keep_folders: {{ args.dockerfile.run.build_keep_folders | default(["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/build"]) }}
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install && catkin build"
 
 entrypoint:
     source: ["/opt/ros/noetic/setup.bash",
-             "/workspace/install/setup.bash"]
+             "/workspace/build/setup.bash"]
 
 devcontainer:
     vscode:

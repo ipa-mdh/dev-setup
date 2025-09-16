@@ -62,7 +62,7 @@ function run_container_with_arguments {
 	{%- endfor %}
 {%- endif %}
 {%- endif %}
-        robot_fanuc:run-1.0 \
+        {{ args.dockerfile.run.tag }} \
         "${CONTAINER_ARGS[@]}"
 }
 
@@ -75,7 +75,7 @@ function run_container_without_arguments {
 	{%- endfor %}
 {%- endif %}
 {%- endif %}
-        robot_fanuc:run-1.0
+        {{ args.dockerfile.run.tag }}
 }
 
 # If CONTAINER_ARGS empty
