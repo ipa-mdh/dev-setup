@@ -39,7 +39,19 @@ dockerfile:
         tag: "{{ args.package_name }}:run-{{ args.version }}"
         cmd: ["bash", "-c", "ros2 launch {{ args.package_name }} main.launch.py"]
         build: True
+        {%- if args.dockerfile is defined %}
+        {%- if args.dockerfile.run is defined %}
+        {%- if args.dockerfile.run.build_keep_folders is defined %}
         build_keep_folders: {{ args.dockerfile.run.build_keep_folders | default(["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/install"]) }}
+        {%- else %}
+        build_keep_folders: ["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/install"]
+        {%- endif %}
+        {%- else %}
+        build_keep_folders: ["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/install"]
+        {%- endif %}
+        {%- else %}
+        build_keep_folders: ["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/install"]
+        {%- endif %}
         build_cmd: source /opt/dev-setup/setup.bash && colcon build
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
