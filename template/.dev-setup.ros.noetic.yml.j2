@@ -20,7 +20,7 @@ dockerfile:
         tag: "{{ args.package_name }}_devcontainer:{{ args.version }}"
         cmd: ["bash"]
         build: False
-        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --no-install && catkin build"
+        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --no-install --cmake-args -DCMAKE_BUILD_TYPE=Debug && catkin build"
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:ci-{{ args.version }}"
