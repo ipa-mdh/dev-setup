@@ -52,7 +52,7 @@ dockerfile:
         {%- else %}
         build_keep_folders: ["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/install"]
         {%- endif %}
-        build_cmd: source /opt/dev-setup/setup.bash && colcon build
+        build_cmd: source /opt/dev-setup/setup.bash && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:

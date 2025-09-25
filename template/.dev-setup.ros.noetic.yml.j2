@@ -39,7 +39,7 @@ dockerfile:
         build_keep_folders: {{ args.dockerfile.run.build_keep_folders | default(["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/build"]) }}
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
-        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install && catkin build"
+        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install --cmake-args -DCMAKE_BUILD_TYPE=Release && catkin build"
         registry:
             tag: "{{ args.docker.registry }}:run-{{ args.version }}"
 
