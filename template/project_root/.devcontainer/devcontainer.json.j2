@@ -38,9 +38,12 @@
 	},
 {%- if args.docker is defined %}
 	{%- if args.docker.runArgs is defined %}
-	"runArgs": {{ args.docker.runArgs | tojson }}
+	"runArgs": {{ args.docker.runArgs | tojson }},
 	{%- endif %}
 {%- endif %}
+	"mounts": [
+		"source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached,readonly"
+	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
