@@ -19,9 +19,9 @@ dockerfile:
     devcontainer:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
-        cmd: ["bash"]
+        cmd: {{ args.dockerfile.devcontainer.cmd | default(["bash"]) }}
         build: False
-        build_cmd: source /opt/dev-setup/setup.bash && colcon build
+        build_cmd: {{ args.dockerfile.devcontainer.build_cmd | default("source /opt/dev-setup/setup.bash && colcon build") }}
         order: 1
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
@@ -37,7 +37,19 @@ dockerfile:
     run:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
+        {%- if args.dockerfile is defined %}
+        {%- if args.dockerfile.run is defined %}
+        {%- if args.dockerfile.run.cmd is defined %}
+        cmd: {{ args.dockerfile.run.cmd }}
+        {%- else %}
         cmd: ["bash", "-c", "ros2 launch {{ args.package_name }} main.launch.py"]
+        {%- endif %}
+        {%- else %}
+        cmd: ["bash", "-c", "ros2 launch {{ args.package_name }} main.launch.py"]
+        {%- endif %}
+        {%- else %}
+        cmd: ["bash", "-c", "ros2 launch {{ args.package_name }} main.launch.py"]
+        {%- endif %}
         build: True
         {%- if args.dockerfile is defined %}
         {%- if args.dockerfile.run is defined %}
@@ -52,7 +64,7 @@ dockerfile:
         {%- else %}
         build_keep_folders: ["/opt/dev-setup", "/root/.conan2", "/opt/ros", "/workspace/install"]
         {%- endif %}
-        build_cmd: source /opt/dev-setup/setup.bash && colcon build
+        build_cmd: {{ args.dockerfile.run.build_cmd | default("source /opt/dev-setup/setup.bash && colcon build") }}
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
         registry:
