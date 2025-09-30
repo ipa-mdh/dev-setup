@@ -182,8 +182,25 @@ function install_apt_deps {
     apt install -y \
         python3-pip \
         python3-virtualenv \
-        git
+        git \
+        git-lfs
     rv=$?
+    return $rv
+}
+
+function install_git_lfs {
+    rv=0
+    command -v git-lfs > /dev/null 2>&1
+    installed=$?
+    if [ $installed = '0' ]; then
+        echo "git-lfs is installed"
+        git lfs install
+        rv=$?
+    else
+        echo "git-lfs is not installed"
+        rv=0
+    fi
+
     return $rv
 }
 
@@ -397,6 +414,7 @@ function install_conan_packages {
 error_counter=0
 commands=(
     "install_apt_deps"
+    "install_git_lfs"
     "install_pip_deps"
     "clone_repos"
     # "update_git_submodules"
