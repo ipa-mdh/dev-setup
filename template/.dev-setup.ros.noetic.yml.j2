@@ -20,7 +20,7 @@ dockerfile:
         tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
         cmd: ["bash"]
         build: False
-        build_cmd: source /opt/dev-setup/setup.bash && && catkin config --no-install && catkin build
+        build_cmd: source /opt/dev-setup/setup.bash && catkin config --no-install && catkin build
         order: 1
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
