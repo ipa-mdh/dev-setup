@@ -26,10 +26,11 @@ RUN ./src/{{ args.package_name }}/.dev-setup/install.sh
 RUN rm -rf ~/.git-credentials
 
 # Build the workspace
+RUN rm -rf /workspace/build /workspace/devel /workspace/install /workspace/log
 RUN {{ args.dockerfile.run.build_cmd }}
 
 # -----------------------------------------------------------------------------
-FROM {{ args.dockerfile.run.from }}
+FROM {{ args.dockerfile.run.from2 }}
 
 {%- if args.dockerfile.run.build_keep_folders is defined %}
 {%- for folder in args.dockerfile.run.build_keep_folders %}

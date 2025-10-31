@@ -15,13 +15,6 @@ dockerfile:
         registry:
             tag: "{{ args.docker.registry }}/{{ args.package_name }}:base-{{ args.version }}"
         order: 0
-    devcontainer:
-        from: "{{ args.package_name }}:base-{{ args.version }}"
-        tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
-        cmd: ["bash"]
-        build: False
-        build_cmd: source /opt/dev-setup/setup.bash && catkin config --no-install && catkin build
-        order: 1
     ci:
         from: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:ci-{{ args.version }}"
@@ -33,8 +26,18 @@ dockerfile:
         registry:
             tag: "{{ args.docker.registry }}/{{ args.package_name }}:ci-{{ args.version }}"
         order: 1
+    devcontainer:
+        from: "{{ args.package_name }}:ci-{{ args.version }}"
+        tag: "{{ args.package_name }}:devcontainer-{{ args.version }}"
+        cmd: ["bash"]
+        build: True
+        build_cmd: source /opt/dev-setup/setup.bash && catkin config --no-install && catkin build
+        registry:
+            tag: "{{ args.docker.registry }}/{{ args.package_name }}:devcontainer-{{ args.version }}"
+        order: 2
     run:
-        from: "{{ args.package_name }}:base-{{ args.version }}"
+        from: "{{ args.package_name }}:ci-{{ args.version }}"
+        from2: "{{ args.package_name }}:base-{{ args.version }}"
         tag: "{{ args.package_name }}:run-{{ args.version }}"
         cmd: ["bash", "-c", "roslaunch {{ args.package_name }} node"]
         build: True

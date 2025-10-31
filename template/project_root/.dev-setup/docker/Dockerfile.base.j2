@@ -8,6 +8,20 @@ FROM {{ args.dockerfile.base.from }}
 # upgrade apt
 RUN apt-get update && apt-get upgrade -y
 
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get install -y locales kbd
+
+# Generate locales
+RUN locale-gen en_US.UTF-8
+# Set environment variables for locale
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+# Preconfigure keyboard layout and locale
+RUN echo "keyboard-configuration keyboard-configuration/layout select de" | debconf-set-selections && \
+    echo "keyboard-configuration keyboard-configuration/model select Generic 104-key PC" | debconf-set-selections
+
 # Set the working directory
 WORKDIR /workspace/src
 

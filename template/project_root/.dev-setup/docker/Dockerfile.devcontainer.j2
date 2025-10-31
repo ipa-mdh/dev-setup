@@ -22,6 +22,7 @@ RUN apt install graphviz -y
 
 # Make sure the install script is executable
 RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/install.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/.devcontainer/postCreateCommand.sh
 
 # Run the main launch file
 CMD {{ args.dockerfile.devcontainer.cmd | replace("'", '"') }}

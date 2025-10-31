@@ -19,5 +19,15 @@ RUN apt update
 RUN apt install doxygen -y
 RUN apt install graphviz -y
 
+# Make sure the install script is executable
+RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/install.sh
+RUN chmod +x /workspace/src/{{ args.package_name }}/.devcontainer/postCreateCommand.sh
+
+# Run the installation script
+RUN --mount=type=secret,id=gitcreds,dst=/tmp/.git-credentials \
+    ./src/{{ args.package_name }}/.dev-setup/setup_git_credentials.sh --git-credentials-file /tmp/.git-credentials
+RUN ./src/{{ args.package_name }}/.devcontainer/postCreateCommand.sh
+RUN rm -rf ~/.git-credentials
+
 # Run the main launch file
 CMD {{ args.dockerfile.ci.cmd | replace("'", '"') }}
