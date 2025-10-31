@@ -24,5 +24,10 @@ RUN apt install graphviz -y
 RUN chmod +x /workspace/src/{{ args.package_name }}/.dev-setup/install.sh
 RUN chmod +x /workspace/src/{{ args.package_name }}/.devcontainer/postCreateCommand.sh
 
+# copy xstartup
+RUN mkdir -p /root/.vnc
+COPY .devcontainer/xstartup /root/.vnc/xstartup
+RUN chmod +x /root/.vnc/xstartup
+
 # Run the main launch file
 CMD {{ args.dockerfile.devcontainer.cmd | replace("'", '"') }}

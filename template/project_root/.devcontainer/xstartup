@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Clean potential stale session variables from display managers
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+
+# Load user X resources if available
+if [ -r "$HOME/.Xresources" ]; then
+    xrdb "$HOME/.Xresources"
+fi
+
+# Start auxiliary helpers in background when present
+if command -v vncconfig >/dev/null 2>&1; then
+    vncconfig -iconic &
+fi
+
+# Launch a lightweight window manager to keep the VNC session alive
+exec fluxbox
