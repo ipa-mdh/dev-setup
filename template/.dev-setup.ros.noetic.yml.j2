@@ -22,7 +22,7 @@ dockerfile:
         build: True
         build_arguments:
             secret: id=gitcreds,src=$HOME/.git-credentials
-        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin config --install && catkin build"
+        build_cmd: "source /opt/dev-setup/setup.bash && catkin init && catkin build"
         registry:
             tag: "{{ args.docker.registry }}/{{ args.package_name }}:ci-{{ args.version }}"
         order: 1
