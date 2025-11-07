@@ -182,7 +182,8 @@ function install_apt_deps {
     apt install -y \
         python3-pip \
         python3-virtualenv \
-        git
+        git \
+        iputils-ping
     rv=$?
     return $rv
 }
